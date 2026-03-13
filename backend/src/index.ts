@@ -10,6 +10,7 @@ const port = Number(process.env.PORT) || 3000;
 const app = new Elysia()
   .use(cors())
   .get("/health", () => ({ ok: true, service: "tico-api", time: new Date().toISOString() }))
+  .get("/api/health", () => ({ ok: true, service: "tico-api", time: new Date().toISOString() }))
   .use(authRoutes)
   .use(tripRoutes)
   .use(driverRoutes)
