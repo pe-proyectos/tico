@@ -23,9 +23,11 @@ export default function DriverHistory() {
           {(['today', 'week'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               flex: 1, padding: '10px', borderRadius: 'var(--radius-sm)',
-              background: filter === f ? 'var(--secondary)' : 'var(--gray-100)',
-              color: filter === f ? 'white' : 'var(--gray-600)',
-              fontWeight: 600, fontSize: 14, border: 'none',
+              background: filter === f ? 'var(--primary)' : 'var(--white)',
+              color: filter === f ? 'var(--secondary)' : 'var(--gray-600)',
+              fontWeight: 700, fontSize: 14, border: filter === f ? 'none' : '2px solid var(--gray-200)',
+              fontFamily: 'var(--font-display)', textTransform: 'uppercase',
+              boxShadow: filter === f ? '0 3px 8px rgba(255,193,7,0.3)' : 'none',
             }}>
               {f === 'today' ? 'Hoy' : 'Esta semana'}
             </button>
@@ -35,12 +37,12 @@ export default function DriverHistory() {
         {/* Summary */}
         <div className="card" style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 16 }}>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: 24, fontWeight: 700 }}>{count}</p>
-            <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>Viajes</p>
+            <p style={{ fontSize: 28, fontWeight: 700, fontFamily: 'var(--font-display)' }}>{count}</p>
+            <p style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Viajes</p>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: 24, fontWeight: 700, color: 'var(--success)' }}>S/ {total.toFixed(2)}</p>
-            <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>Ganancias</p>
+            <p style={{ fontSize: 28, fontWeight: 700, color: 'var(--success)', fontFamily: 'var(--font-display)' }}>S/ {total.toFixed(2)}</p>
+            <p style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Ganancias</p>
           </div>
         </div>
 
@@ -49,13 +51,13 @@ export default function DriverHistory() {
           {filtered.map(t => (
             <div key={t.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <p style={{ fontWeight: 600, fontSize: 14 }}>{t.origin} → {t.destination}</p>
+                <p style={{ fontWeight: 600, fontSize: 14 }}>🚕 {t.origin} → {t.destination}</p>
                 <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>
                   {new Date(t.date).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })} · {t.passengerName}
                 </p>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontWeight: 700, color: 'var(--success)' }}>S/ {t.price.toFixed(2)}</p>
+                <p style={{ fontWeight: 700, color: 'var(--success)', fontFamily: 'var(--font-display)' }}>S/ {t.price.toFixed(2)}</p>
                 <p style={{ color: 'var(--primary)', fontSize: 12 }}>★ {t.rating}</p>
               </div>
             </div>

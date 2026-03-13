@@ -21,15 +21,21 @@ export default function DriverRequest() {
         background: 'var(--white)', borderRadius: 'var(--radius-lg)',
         padding: 24, width: '100%', maxWidth: 380,
         animation: 'slideUp 0.3s ease',
+        border: '3px solid var(--primary)',
       }}>
         {/* Timer */}
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
           <div style={{
-            width: 64, height: 64, borderRadius: '50%', border: '4px solid var(--primary)',
+            width: 72, height: 72, borderRadius: '50%', border: '4px solid var(--primary)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 28, fontWeight: 700, margin: '0 auto 8px', color: countdown <= 5 ? 'var(--danger)' : 'var(--secondary)',
+            fontSize: 30, fontWeight: 700, margin: '0 auto 8px',
+            color: countdown <= 5 ? 'var(--danger)' : 'var(--secondary)',
+            fontFamily: 'var(--font-display)',
+            background: countdown <= 5 ? 'rgba(211,47,47,0.05)' : 'rgba(255,193,7,0.08)',
           }}>{countdown}s</div>
-          <h2 style={{ fontWeight: 700 }}>¡Nueva solicitud!</h2>
+          <h2 style={{ fontWeight: 700, fontFamily: 'var(--font-display)', textTransform: 'uppercase', fontSize: 22 }}>
+            🚕 ¡Nueva solicitud!
+          </h2>
         </div>
 
         {/* Trip info */}
@@ -44,11 +50,11 @@ export default function DriverRequest() {
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ marginBottom: 16 }}>
-                <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>Origen</p>
+                <p style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Origen</p>
                 <p style={{ fontWeight: 600 }}>Parque Principal, Chiclayo</p>
               </div>
               <div>
-                <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>Destino</p>
+                <p style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Destino</p>
                 <p style={{ fontWeight: 600 }}>Real Plaza, Chiclayo</p>
               </div>
             </div>
@@ -56,12 +62,12 @@ export default function DriverRequest() {
 
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
             <div className="card" style={{ textAlign: 'center', flex: 1 }}>
-              <p style={{ fontSize: 11, color: 'var(--gray-400)' }}>Precio</p>
-              <p style={{ fontWeight: 700, fontSize: 20, color: 'var(--success)' }}>S/ 8.50</p>
+              <p style={{ fontSize: 11, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Precio</p>
+              <p style={{ fontWeight: 700, fontSize: 22, color: 'var(--success)', fontFamily: 'var(--font-display)' }}>S/ 8.50</p>
             </div>
             <div className="card" style={{ textAlign: 'center', flex: 1 }}>
-              <p style={{ fontSize: 11, color: 'var(--gray-400)' }}>Distancia</p>
-              <p style={{ fontWeight: 700, fontSize: 20 }}>2.3 km</p>
+              <p style={{ fontSize: 11, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Distancia</p>
+              <p style={{ fontWeight: 700, fontSize: 22, fontFamily: 'var(--font-display)' }}>2.3 km</p>
             </div>
           </div>
         </div>

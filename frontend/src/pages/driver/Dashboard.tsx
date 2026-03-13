@@ -9,7 +9,7 @@ export default function DriverDashboard() {
 
   return (
     <div className="page">
-      <TopBar title="Tico Conductor" />
+      <TopBar title="Conductor" />
 
       <div className="page-content" style={{ paddingTop: 24 }}>
         {/* Toggle */}
@@ -19,15 +19,18 @@ export default function DriverDashboard() {
             style={{
               width: 140, height: 140, borderRadius: '50%',
               background: available ? 'var(--success)' : 'var(--gray-200)',
-              border: 'none', display: 'flex', flexDirection: 'column',
+              border: available ? '4px solid rgba(56,142,60,0.3)' : '4px solid var(--gray-300)',
+              display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center', margin: '0 auto',
-              transition: 'all 0.3s', boxShadow: available ? '0 0 30px rgba(67,160,71,0.3)' : 'none',
+              transition: 'all 0.3s',
+              boxShadow: available ? '0 0 40px rgba(56,142,60,0.3)' : 'var(--shadow-md)',
             }}
           >
             <span style={{ fontSize: 40 }}>{available ? '🟢' : '⭕'}</span>
             <span style={{
               fontWeight: 700, fontSize: 14, marginTop: 8,
               color: available ? 'white' : 'var(--gray-500)',
+              fontFamily: 'var(--font-display)', textTransform: 'uppercase',
             }}>
               {available ? 'Disponible' : 'No disponible'}
             </span>
@@ -40,12 +43,12 @@ export default function DriverDashboard() {
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
           <div className="card" style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>Viajes hoy</p>
-            <p style={{ fontSize: 28, fontWeight: 700 }}>{stats.tripsToday}</p>
+            <p style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Viajes hoy</p>
+            <p style={{ fontSize: 32, fontWeight: 700, fontFamily: 'var(--font-display)' }}>{stats.tripsToday}</p>
           </div>
           <div className="card" style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>Ganado hoy</p>
-            <p style={{ fontSize: 28, fontWeight: 700, color: 'var(--success)' }}>S/ {stats.earningsToday.toFixed(2)}</p>
+            <p style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Ganado hoy</p>
+            <p style={{ fontSize: 28, fontWeight: 700, color: 'var(--success)', fontFamily: 'var(--font-display)' }}>S/ {stats.earningsToday.toFixed(2)}</p>
           </div>
         </div>
 
@@ -53,7 +56,7 @@ export default function DriverDashboard() {
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
           <div style={{ fontSize: 36, color: 'var(--primary)' }}>★</div>
           <div>
-            <p style={{ fontWeight: 700, fontSize: 20 }}>{stats.rating}</p>
+            <p style={{ fontWeight: 700, fontSize: 22, fontFamily: 'var(--font-display)' }}>{stats.rating}</p>
             <p style={{ fontSize: 13, color: 'var(--gray-400)' }}>Tu calificación</p>
           </div>
         </div>
@@ -61,14 +64,16 @@ export default function DriverDashboard() {
         {/* Plan badge */}
         <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <p style={{ fontWeight: 600 }}>Plan actual</p>
+            <p style={{ fontWeight: 700, fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Plan actual</p>
             <span className={`badge ${stats.plan === 'FREE' ? 'badge-neutral' : 'badge-success'}`}>
               {stats.plan}
             </span>
           </div>
           <button onClick={() => nav('/driver/plan')} style={{
             background: 'var(--primary)', color: 'var(--secondary)',
-            padding: '8px 16px', borderRadius: 'var(--radius-sm)', fontWeight: 600, fontSize: 13,
+            padding: '10px 18px', borderRadius: 'var(--radius-sm)', fontWeight: 700, fontSize: 13,
+            fontFamily: 'var(--font-display)', textTransform: 'uppercase',
+            boxShadow: '0 3px 8px rgba(255,193,7,0.3)',
           }}>Ver planes</button>
         </div>
 
