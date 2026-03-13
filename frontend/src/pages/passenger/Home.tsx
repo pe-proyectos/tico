@@ -32,6 +32,7 @@ export default function Home() {
         <div style={{
           background: 'var(--white)', borderRadius: 'var(--radius-lg)',
           boxShadow: 'var(--shadow-lg)', padding: 16,
+          border: '2px solid rgba(255,193,7,0.2)',
         }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12,
@@ -39,9 +40,9 @@ export default function Home() {
             <div style={{
               width: 40, height: 40, borderRadius: '50%', background: 'var(--primary)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
-              flexShrink: 0,
+              flexShrink: 0, boxShadow: '0 2px 8px rgba(255,193,7,0.3)',
             }}>🚕</div>
-            <span style={{ fontWeight: 700, fontSize: 18 }}>Tico</span>
+            <span style={{ fontWeight: 700, fontSize: 20, fontFamily: 'var(--font-display)', textTransform: 'uppercase', letterSpacing: 1 }}>Tico</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -82,9 +83,10 @@ export default function Home() {
           <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
             {['Real Plaza', 'Open Plaza', 'Terminal', 'Hospital', 'USAT'].map(place => (
               <button key={place} onClick={() => { setDestination(place); handleSearch() }} style={{
-                background: 'var(--white)', border: 'none', borderRadius: 'var(--radius-xl)',
-                padding: '10px 16px', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap',
-                boxShadow: 'var(--shadow-md)', color: 'var(--secondary)',
+                background: 'var(--primary)', border: 'none', borderRadius: 'var(--radius-xl)',
+                padding: '10px 16px', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap',
+                boxShadow: '0 3px 10px rgba(255,193,7,0.4)', color: 'var(--secondary)',
+                fontFamily: 'var(--font-display)', textTransform: 'uppercase',
               }}>
                 📍 {place}
               </button>
@@ -100,25 +102,26 @@ export default function Home() {
           background: 'var(--white)', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0',
           boxShadow: 'var(--shadow-lg)', padding: 24,
           animation: 'slideUp 0.3s ease',
+          borderTop: '3px solid var(--primary)',
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
             <div>
-              <p style={{ color: 'var(--gray-500)', fontSize: 13 }}>Destino</p>
-              <p style={{ fontWeight: 600, fontSize: 16 }}>{destination}</p>
+              <p style={{ color: 'var(--gray-500)', fontSize: 13, fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Destino</p>
+              <p style={{ fontWeight: 700, fontSize: 16, fontFamily: 'var(--font-display)' }}>{destination}</p>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ color: 'var(--gray-500)', fontSize: 13 }}>Precio estimado</p>
-              <p style={{ fontWeight: 700, fontSize: 24, color: 'var(--primary)' }}>S/ {trip.price.toFixed(2)}</p>
+              <p style={{ color: 'var(--gray-500)', fontSize: 13, fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Precio estimado</p>
+              <p style={{ fontWeight: 700, fontSize: 28, color: 'var(--primary-dark)', fontFamily: 'var(--font-display)' }}>S/ {trip.price.toFixed(2)}</p>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
             <div style={{ textAlign: 'center', flex: 1 }}>
-              <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>Distancia</p>
-              <p style={{ fontWeight: 600 }}>{trip.distance || 2.3} km</p>
+              <p style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Distancia</p>
+              <p style={{ fontWeight: 700, fontFamily: 'var(--font-display)', fontSize: 16 }}>{trip.distance || 2.3} km</p>
             </div>
             <div style={{ textAlign: 'center', flex: 1 }}>
-              <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>Tiempo est.</p>
-              <p style={{ fontWeight: 600 }}>{trip.duration || 8} min</p>
+              <p style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Tiempo est.</p>
+              <p style={{ fontWeight: 700, fontFamily: 'var(--font-display)', fontSize: 16 }}>{trip.duration || 8} min</p>
             </div>
           </div>
           <button className="btn btn-primary" onClick={handleRequest} style={{ fontSize: 18 }}>

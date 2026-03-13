@@ -20,7 +20,7 @@ export default function DriverPlan() {
             const active = plan.name === stats.plan
             return (
               <div key={plan.name} className="card" style={{
-                border: active ? `2px solid ${plan.color}` : '2px solid transparent',
+                border: active ? `3px solid ${plan.color}` : '2px solid rgba(255,193,7,0.15)',
                 position: 'relative',
               }}>
                 {active && (
@@ -29,22 +29,24 @@ export default function DriverPlan() {
                   }}>Plan actual</span>
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <h3 style={{ fontSize: 20, fontWeight: 700 }}>{plan.name}</h3>
+                  <h3 style={{ fontSize: 22, fontWeight: 700, fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>
+                    {plan.name === 'PRO' ? '⭐ ' : plan.name === 'BUSINESS' ? '💎 ' : ''}{plan.name}
+                  </h3>
                   <div style={{ textAlign: 'right' }}>
                     {plan.price > 0 ? (
                       <>
-                        <span style={{ fontSize: 24, fontWeight: 700 }}>S/ {plan.price.toFixed(2)}</span>
+                        <span style={{ fontSize: 26, fontWeight: 700, fontFamily: 'var(--font-display)' }}>S/ {plan.price.toFixed(2)}</span>
                         <span style={{ fontSize: 12, color: 'var(--gray-400)' }}>/mes</span>
                       </>
                     ) : (
-                      <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--gray-400)' }}>Gratis</span>
+                      <span style={{ fontSize: 22, fontWeight: 700, color: 'var(--gray-400)', fontFamily: 'var(--font-display)' }}>Gratis</span>
                     )}
                   </div>
                 </div>
                 <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
                   {plan.features.map(f => (
                     <li key={f} style={{ fontSize: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ color: plan.color }}>✓</span> {f}
+                      <span style={{ color: plan.color, fontWeight: 700 }}>✓</span> {f}
                     </li>
                   ))}
                 </ul>

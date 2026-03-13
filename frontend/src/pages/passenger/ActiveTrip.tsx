@@ -26,24 +26,30 @@ export default function ActiveTrip() {
         alignItems: 'center',
       }}>
         <div>
-          <p style={{ fontSize: 12, opacity: 0.7 }}>Tiempo estimado de llegada</p>
-          <p style={{ fontSize: 20, fontWeight: 700 }}>8 min</p>
+          <p style={{ fontSize: 12, opacity: 0.7, fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Tiempo estimado</p>
+          <p style={{ fontSize: 22, fontWeight: 700, fontFamily: 'var(--font-display)' }}>8 min</p>
         </div>
         <div style={{
           background: 'var(--primary)', padding: '6px 14px',
           borderRadius: 'var(--radius-sm)', fontWeight: 700, color: 'var(--secondary)',
-        }}>En camino</div>
+          fontFamily: 'var(--font-display)', textTransform: 'uppercase',
+        }}>🚕 En camino</div>
       </div>
+      <div style={{
+        height: 4,
+        background: 'repeating-conic-gradient(var(--secondary) 0% 25%, var(--primary) 0% 50%) 0 0 / 8px 8px',
+      }} />
 
       {/* Driver card */}
       <div style={{ padding: 16, background: 'var(--white)', flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
           <div style={{
-            width: 48, height: 48, borderRadius: '50%', background: 'var(--gray-100)',
+            width: 48, height: 48, borderRadius: '50%', background: 'rgba(255,193,7,0.15)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24,
+            border: '2px solid var(--primary)',
           }}>👤</div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontWeight: 700 }}>{trip?.driver?.name || 'Pedro Ruiz'}</p>
+            <p style={{ fontWeight: 700, fontFamily: 'var(--font-display)' }}>{trip?.driver?.name || 'Pedro Ruiz'}</p>
             <p style={{ fontSize: 13, color: 'var(--gray-500)' }}>
               {trip?.driver?.vehicle || 'Toyota Yaris Blanco'} · {trip?.driver?.plate || 'ABC-123'}
             </p>
@@ -59,16 +65,16 @@ export default function ActiveTrip() {
           marginBottom: 16,
         }}>
           <div style={{ flex: 1, textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: 'var(--gray-400)' }}>Origen</p>
+            <p style={{ fontSize: 11, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Origen</p>
             <p style={{ fontWeight: 500, fontSize: 13 }}>{trip?.origin?.address || 'Parque Principal'}</p>
           </div>
           <div style={{ flex: 1, textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: 'var(--gray-400)' }}>Destino</p>
+            <p style={{ fontSize: 11, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Destino</p>
             <p style={{ fontWeight: 500, fontSize: 13 }}>{trip?.destination?.address || 'Real Plaza'}</p>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: 'var(--gray-400)' }}>Precio</p>
-            <p style={{ fontWeight: 700, color: 'var(--primary)' }}>S/ {trip?.price?.toFixed(2) || '8.50'}</p>
+            <p style={{ fontSize: 11, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Precio</p>
+            <p style={{ fontWeight: 700, color: 'var(--primary-dark)', fontFamily: 'var(--font-display)', fontSize: 16 }}>S/ {trip?.price?.toFixed(2) || '8.50'}</p>
           </div>
         </div>
 
