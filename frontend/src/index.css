@@ -360,6 +360,10 @@ h1, h2, h3 {
     align-items: flex-start;
     min-height: 100dvh;
   }
+  .app-shell {
+    width: 430px;
+    flex-shrink: 0;
+  }
   body::before {
     content: '🚕 Tico';
     position: fixed;
