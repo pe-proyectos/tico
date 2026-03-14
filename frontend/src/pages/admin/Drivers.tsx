@@ -30,13 +30,14 @@ export default function AdminDrivers() {
       <TopBar title="Conductores" />
       <div className="page-content">
         {/* Filters */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 16, overflowX: 'auto' }}>
           {(['ALL', 'PENDING', 'APPROVED', 'REJECTED'] as const).map(s => (
             <button key={s} onClick={() => setFilter(s)} style={{
-              padding: '8px 14px', borderRadius: 'var(--radius-xl)',
-              background: filter === s ? 'var(--secondary)' : 'var(--gray-100)',
+              padding: '8px 14px', borderRadius: 'var(--radius-full)',
+              background: filter === s ? 'var(--secondary)' : 'var(--white)',
               color: filter === s ? 'white' : 'var(--gray-600)',
-              fontWeight: 500, fontSize: 13, border: 'none',
+              fontWeight: 500, fontSize: 13, border: filter === s ? 'none' : '1px solid var(--gray-200)',
+              whiteSpace: 'nowrap', transition: 'all 0.2s',
             }}>
               {s === 'ALL' ? 'Todos' : statusLabel[s]}
             </button>
@@ -68,12 +69,14 @@ export default function AdminDrivers() {
                     {d.status === 'PENDING' && (
                       <div style={{ display: 'flex', gap: 4 }}>
                         <button onClick={() => updateStatus(d.id, 'APPROVED')} style={{
-                          padding: '6px 10px', borderRadius: 6, background: 'var(--success)',
-                          color: 'white', fontSize: 12, fontWeight: 600, border: 'none',
+                          padding: '6px 10px', borderRadius: 6,
+                          background: 'var(--success)', color: 'white',
+                          fontSize: 12, fontWeight: 600, border: 'none',
                         }}>✓</button>
                         <button onClick={() => updateStatus(d.id, 'REJECTED')} style={{
-                          padding: '6px 10px', borderRadius: 6, background: 'var(--danger)',
-                          color: 'white', fontSize: 12, fontWeight: 600, border: 'none',
+                          padding: '6px 10px', borderRadius: 6,
+                          background: 'var(--danger)', color: 'white',
+                          fontSize: 12, fontWeight: 600, border: 'none',
                         }}>✗</button>
                       </div>
                     )}

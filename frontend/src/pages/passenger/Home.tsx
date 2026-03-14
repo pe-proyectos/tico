@@ -62,68 +62,67 @@ export default function Home() {
         style={{ height: '100%', position: 'absolute', inset: 0 }}
       />
 
-      {/* Search bar */}
+      {/* Floating search card */}
       <div style={{
         position: 'absolute', top: 16, left: 16, right: 16, zIndex: 1000,
       }}>
-        <div style={{
-          background: 'var(--white)', borderRadius: 'var(--radius-lg)',
+        <div className="glass" style={{
+          borderRadius: 'var(--radius-lg)',
           boxShadow: 'var(--shadow-lg)', padding: 16,
-          border: '2px solid rgba(255,193,7,0.2)',
         }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12,
-          }}>
-            <div style={{
-              width: 40, height: 40, borderRadius: '50%', background: 'var(--primary)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
-              flexShrink: 0, boxShadow: '0 2px 8px rgba(255,193,7,0.3)',
-            }}>🚕</div>
-            <span style={{ fontWeight: 700, fontSize: 20, fontFamily: 'var(--font-display)', textTransform: 'uppercase', letterSpacing: 1 }}>Tico</span>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '10px 12px', background: 'var(--gray-50)', borderRadius: 'var(--radius-sm)',
               fontSize: 14, color: 'var(--gray-500)',
             }}>
-              <span style={{ color: 'var(--success)', fontSize: 10 }}>●</span>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--success)', flexShrink: 0 }} />
               Mi ubicación actual
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <input
-                className="input"
-                placeholder="¿A dónde vas?"
-                value={destination}
-                onChange={e => setDestination(e.target.value)}
-                style={{ fontSize: 15 }}
-              />
+              <div style={{ flex: 1, position: 'relative' }}>
+                <span style={{
+                  position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
+                  color: 'var(--gray-400)', fontSize: 16, pointerEvents: 'none',
+                }}>🔍</span>
+                <input
+                  className="input"
+                  placeholder="¿A dónde vas?"
+                  value={destination}
+                  onChange={e => setDestination(e.target.value)}
+                  style={{ paddingLeft: 38 }}
+                />
+              </div>
               <button
                 className="btn btn-primary"
-                style={{ width: 'auto', padding: '12px 20px' }}
+                style={{ width: 'auto', padding: '12px 20px', minHeight: 'auto' }}
                 onClick={handleSearch}
                 disabled={!destination || loading}
               >
-                Ir
+                →
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Quick destinations */}
+      {/* Quick destination chips */}
       {!showPanel && (
         <div style={{
-          position: 'absolute', bottom: 24, left: 16, right: 16, zIndex: 1000,
+          position: 'absolute', bottom: 24, left: 0, right: 0, zIndex: 1000,
+          padding: '0 16px',
         }}>
-          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+          <div style={{
+            display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4,
+            scrollbarWidth: 'none',
+          }}>
             {['Real Plaza', 'Open Plaza', 'Terminal', 'Hospital', 'USAT'].map(place => (
-              <button key={place} onClick={() => { setDestination(place); }} style={{
-                background: 'var(--primary)', border: 'none', borderRadius: 'var(--radius-xl)',
-                padding: '10px 16px', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap',
-                boxShadow: '0 3px 10px rgba(255,193,7,0.4)', color: 'var(--secondary)',
-                fontFamily: 'var(--font-display)', textTransform: 'uppercase',
+              <button key={place} onClick={() => setDestination(place)} style={{
+                background: 'var(--white)', border: 'none',
+                borderRadius: 'var(--radius-full)',
+                padding: '10px 16px', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap',
+                boxShadow: 'var(--shadow-md)', color: 'var(--secondary)',
+                transition: 'all 0.2s',
               }}>
                 📍 {place}
               </button>
@@ -132,37 +131,37 @@ export default function Home() {
         </div>
       )}
 
-      {/* Price panel */}
+      {/* Price bottom sheet */}
       {showPanel && trip && (
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000,
-          background: 'var(--white)', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0',
-          boxShadow: 'var(--shadow-lg)', padding: 24,
-          animation: 'slideUp 0.3s ease',
-          borderTop: '3px solid var(--primary)',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div className="bottom-sheet">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
             <div>
-              <p style={{ color: 'var(--gray-500)', fontSize: 13, fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Destino</p>
-              <p style={{ fontWeight: 700, fontSize: 16, fontFamily: 'var(--font-display)' }}>{destination}</p>
+              <p style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 2 }}>Destino</p>
+              <p style={{ fontWeight: 700, fontSize: 16 }}>{destination}</p>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ color: 'var(--gray-500)', fontSize: 13, fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Precio estimado</p>
-              <p style={{ fontWeight: 700, fontSize: 28, color: 'var(--primary-dark)', fontFamily: 'var(--font-display)' }}>S/ {trip.price.toFixed(2)}</p>
+              <p style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 2 }}>Precio estimado</p>
+              <p style={{ fontWeight: 800, fontSize: 30, color: 'var(--secondary)' }}>S/ {trip.price.toFixed(2)}</p>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
-            <div style={{ textAlign: 'center', flex: 1 }}>
-              <p style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Distancia</p>
-              <p style={{ fontWeight: 700, fontFamily: 'var(--font-display)', fontSize: 16 }}>{trip.distance || 2.3} km</p>
+          <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
+            <div style={{
+              textAlign: 'center', flex: 1, padding: '10px',
+              background: 'var(--gray-50)', borderRadius: 'var(--radius-sm)',
+            }}>
+              <p style={{ fontSize: 12, color: 'var(--gray-400)', marginBottom: 2 }}>Distancia</p>
+              <p style={{ fontWeight: 700, fontSize: 16 }}>{trip.distance || 2.3} km</p>
             </div>
-            <div style={{ textAlign: 'center', flex: 1 }}>
-              <p style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Tiempo est.</p>
-              <p style={{ fontWeight: 700, fontFamily: 'var(--font-display)', fontSize: 16 }}>{trip.duration || 8} min</p>
+            <div style={{
+              textAlign: 'center', flex: 1, padding: '10px',
+              background: 'var(--gray-50)', borderRadius: 'var(--radius-sm)',
+            }}>
+              <p style={{ fontSize: 12, color: 'var(--gray-400)', marginBottom: 2 }}>Tiempo est.</p>
+              <p style={{ fontWeight: 700, fontSize: 16 }}>{trip.duration || 8} min</p>
             </div>
           </div>
-          <button className="btn btn-primary" onClick={handleRequest} style={{ fontSize: 18 }}>
-            🚕 Buscar Taxista
+          <button className="btn btn-primary" onClick={handleRequest} style={{ fontSize: 16, fontWeight: 700 }}>
+            Buscar Taxista
           </button>
           <button className="btn btn-outline" onClick={() => { setShowPanel(false); setRoute(undefined) }} style={{ marginTop: 8 }}>
             Cancelar

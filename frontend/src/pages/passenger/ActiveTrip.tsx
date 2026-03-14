@@ -16,7 +16,6 @@ export default function ActiveTrip() {
 
   useEffect(() => { if (id) getTrip(id) }, [id])
 
-  // Simulate driver movement
   useEffect(() => {
     const i = setInterval(() => {
       setProgress(p => {
@@ -44,75 +43,91 @@ export default function ActiveTrip() {
 
   return (
     <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column' }}>
-      {/* Map */}
       <div style={{ flex: 1, position: 'relative' }}>
         <Map center={driverPos} zoom={15} markers={markers} route={[origin, dest]} style={{ height: '100%' }} />
-      </div>
 
-      {/* ETA bar */}
-      <div style={{
-        background: 'var(--secondary)', color: 'var(--white)',
-        padding: '12px 16px', display: 'flex', justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-        <div>
-          <p style={{ fontSize: 12, opacity: 0.7, fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Tiempo estimado</p>
-          <p style={{ fontSize: 22, fontWeight: 700, fontFamily: 'var(--font-display)' }}>{eta} min</p>
-        </div>
+        {/* ETA floating pill */}
         <div style={{
-          background: 'var(--primary)', padding: '6px 14px',
-          borderRadius: 'var(--radius-sm)', fontWeight: 700, color: 'var(--secondary)',
-          fontFamily: 'var(--font-display)', textTransform: 'uppercase',
-        }}>🚕 En camino</div>
+          position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 1000, background: 'var(--secondary-deep)', color: 'var(--white)',
+          padding: '8px 20px', borderRadius: 'var(--radius-full)',
+          boxShadow: 'var(--shadow-lg)', display: 'flex', alignItems: 'center', gap: 10,
+        }}>
+          <span style={{ fontSize: 13, opacity: 0.7 }}>Llegada en</span>
+          <span style={{ fontSize: 18, fontWeight: 800 }}>{eta} min</span>
+        </div>
+
+        {/* Status pill */}
+        <div style={{
+          position: 'absolute', top: 60, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 1000, background: 'var(--primary-gradient)',
+          padding: '6px 14px', borderRadius: 'var(--radius-full)',
+          fontSize: 12, fontWeight: 600, color: 'var(--secondary-deep)',
+          boxShadow: '0 4px 12px rgba(255,143,0,0.3)',
+        }}>
+          🚕 En camino
+        </div>
       </div>
-      <div style={{
-        height: 4,
-        background: 'repeating-conic-gradient(var(--secondary) 0% 25%, var(--primary) 0% 50%) 0 0 / 8px 8px',
-      }} />
 
       {/* Driver card */}
-      <div style={{ padding: 16, background: 'var(--white)' }}>
+      <div style={{
+        background: 'var(--white)', padding: 20,
+        boxShadow: '0 -4px 20px rgba(0,0,0,0.08)',
+        borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0',
+      }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
           <div style={{
-            width: 48, height: 48, borderRadius: '50%', background: 'rgba(255,193,7,0.15)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24,
-            border: '2px solid var(--primary)',
+            width: 48, height: 48, borderRadius: '50%', background: 'var(--gray-100)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
           }}>👤</div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontWeight: 700, fontFamily: 'var(--font-display)' }}>{trip?.driver?.name || 'Pedro Ruiz'}</p>
+            <p style={{ fontWeight: 700, fontSize: 15 }}>{trip?.driver?.name || 'Pedro Ruiz'}</p>
             <p style={{ fontSize: 13, color: 'var(--gray-500)' }}>
               {trip?.driver?.vehicle || 'Toyota Yaris Blanco'} · {trip?.driver?.plate || 'ABC-123'}
             </p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--primary)' }}>
-            <span>★</span><span style={{ fontWeight: 600 }}>{trip?.driver?.rating || 4.7}</span>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 3,
+            background: 'rgba(251,191,36,0.12)', padding: '4px 8px',
+            borderRadius: 'var(--radius-full)', fontSize: 13, fontWeight: 600,
+          }}>
+            <span style={{ color: '#FBBF24' }}>★</span>
+            <span>{trip?.driver?.rating || 4.7}</span>
           </div>
         </div>
 
         <div style={{
-          display: 'flex', gap: 8, padding: '12px 0',
+          display: 'flex', gap: 12, padding: '14px 0',
           borderTop: '1px solid var(--gray-100)', borderBottom: '1px solid var(--gray-100)',
           marginBottom: 16,
         }}>
-          <div style={{ flex: 1, textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Origen</p>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 11, color: 'var(--gray-400)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Origen</p>
             <p style={{ fontWeight: 500, fontSize: 13 }}>{trip?.origin?.address || 'Parque Principal'}</p>
           </div>
-          <div style={{ flex: 1, textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Destino</p>
+          <div style={{ width: 1, background: 'var(--gray-100)' }} />
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 11, color: 'var(--gray-400)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Destino</p>
             <p style={{ fontWeight: 500, fontSize: 13 }}>{trip?.destination?.address || 'Real Plaza'}</p>
           </div>
+          <div style={{ width: 1, background: 'var(--gray-100)' }} />
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Precio</p>
-            <p style={{ fontWeight: 700, color: 'var(--primary-dark)', fontFamily: 'var(--font-display)', fontSize: 16 }}>S/ {trip?.price?.toFixed(2) || '8.50'}</p>
+            <p style={{ fontSize: 11, color: 'var(--gray-400)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Precio</p>
+            <p style={{ fontWeight: 700, fontSize: 16, color: 'var(--secondary)' }}>S/ {trip?.price?.toFixed(2) || '8.50'}</p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 12 }}>
-          <a href="tel:105" className="btn btn-danger" style={{ flex: 1, textDecoration: 'none' }}>
-            🚨 Emergencia 105
+        <div style={{ display: 'flex', gap: 10 }}>
+          <a href="tel:105" style={{
+            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 6, padding: '12px', borderRadius: 'var(--radius-md)',
+            background: 'var(--gray-50)', color: 'var(--danger)',
+            fontSize: 13, fontWeight: 600, textDecoration: 'none',
+            border: '1px solid var(--gray-100)',
+          }}>
+            🚨 Emergencia
           </a>
-          <button className="btn btn-outline" style={{ flex: 1 }}
+          <button className="btn btn-outline" style={{ flex: 1, minHeight: 'auto', padding: '12px' }}
             onClick={() => nav(`/trip/${id}/complete`)}>
             Simular llegada
           </button>

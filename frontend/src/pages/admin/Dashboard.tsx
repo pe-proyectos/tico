@@ -13,26 +13,39 @@ export default function AdminDashboard() {
     <div className="page">
       <TopBar title="Admin" />
       <div className="page-content">
-        <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16, fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Dashboard</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>Dashboard</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
           {stats.map(s => (
-            <div key={s.label} className="card" style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 28, marginBottom: 4 }}>{s.icon}</div>
-              <p style={{ fontSize: 26, fontWeight: 700, color: s.color, fontFamily: 'var(--font-display)' }}>{s.value}</p>
-              <p style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>{s.label}</p>
+            <div key={s.label} className="card" style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+            }}>
+              <div style={{
+                width: 44, height: 44, borderRadius: 'var(--radius-sm)',
+                background: `${s.color}12`, display: 'flex',
+                alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0,
+              }}>{s.icon}</div>
+              <div>
+                <p style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</p>
+                <p style={{ fontSize: 11, color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>{s.label}</p>
+              </div>
             </div>
           ))}
         </div>
 
         <div className="card">
-          <h3 style={{ fontWeight: 700, marginBottom: 12, fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>Actividad reciente</h3>
+          <h3 style={{ fontWeight: 700, marginBottom: 12, fontSize: 15 }}>Actividad reciente</h3>
           {['Carlos pidió viaje a Real Plaza', 'Pedro aceptó solicitud', 'María completó viaje', 'Nuevo conductor registrado'].map((a, i) => (
             <div key={i} style={{
-              padding: '10px 0',
+              padding: '12px 0',
               borderBottom: i < 3 ? '1px solid var(--gray-100)' : 'none',
               fontSize: 14, color: 'var(--gray-600)',
+              display: 'flex', alignItems: 'center', gap: 10,
             }}>
-              <span style={{ marginRight: 8, color: 'var(--primary)' }}>●</span>{a}
+              <span style={{
+                width: 6, height: 6, borderRadius: '50%',
+                background: 'var(--primary)', flexShrink: 0,
+              }} />
+              {a}
             </div>
           ))}
         </div>
