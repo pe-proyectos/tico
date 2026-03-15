@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Calendar, DollarSign } from 'lucide-react';
 import { api } from '../../lib/api';
 
@@ -12,19 +12,44 @@ interface TripRecord {
   status: string;
 }
 
+const filterMap: Record<string, string> = { hoy: 'today', semana: 'week', mes: 'month' };
+
 export default function DriverHistory() {
   const [filter, setFilter] = useState('hoy');
-  const [trips, setTrips] = useState<TripRecord[]>([]);
+  const [allTrips, setAllTrips] = useState<TripRecord[]>([]);
   const [earnings, setEarnings] = useState(0);
 
   useEffect(() => {
-    api.get<{ ok: boolean; trips: TripRecord[]; earnings: number }>('/driver/history')
+    api.get<{ ok: boolean; trips: TripRecord[]; earnings: number }>(`/driver/history?filter=${filterMap[filter] || 'today'}`)
       .then(res => {
-        setTrips(res.trips || []);
+        setAllTrips(res.trips || []);
         setEarnings(res.earnings || 0);
       })
       .catch(() => {});
-  }, []);
+  }, [filter]);
+
+  // Client-side date filtering as fallback
+  const trips = useMemo(() => {
+    const now = new Date();
+    return allTrips.filter(t => {
+      const d = new Date(t.createdAt);
+      if (filter === 'hoy') {
+        return d.toDateString() === now.toDateString();
+      } else if (filter === 'semana') {
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return d >= weekAgo;
+      }
+      // mes - last 30 days
+      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      return d >= monthAgo;
+    });
+  }, [allTrips, filter]);
+
+  const filteredEarnings = useMemo(() => {
+    return trips
+      .filter(t => t.status === 'COMPLETED')
+      .reduce((sum, t) => sum + (t.finalPrice || t.estimatedPrice || 0), 0);
+  }, [trips]);
 
   const formatTime = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -44,7 +69,6 @@ export default function DriverHistory() {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-black text-tico-black">Historial de Viajes</h1>
 
-      {/* Filters */}
       <div className="flex gap-2">
         {['hoy', 'semana', 'mes'].map((f) => (
           <button
@@ -61,18 +85,16 @@ export default function DriverHistory() {
         ))}
       </div>
 
-      {/* Summary Card */}
       <div className="bg-tico-yellow rounded-3xl p-6 shadow-sm flex items-center justify-between">
         <div>
           <p className="text-tico-black/70 font-bold uppercase text-xs mb-1">Ganancias ({filter})</p>
-          <h2 className="text-4xl font-black text-tico-black">S/ {earnings.toFixed(2)}</h2>
+          <h2 className="text-4xl font-black text-tico-black">S/ {(earnings || filteredEarnings).toFixed(2)}</h2>
         </div>
         <div className="w-16 h-16 rounded-full bg-white/30 flex items-center justify-center">
           <DollarSign className="w-8 h-8 text-tico-black" />
         </div>
       </div>
 
-      {/* Trip List */}
       <div className="space-y-4">
         {trips.length === 0 ? (
           <div className="text-center py-12 text-gray-400 font-medium">No hay viajes registrados</div>

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { wsManager } from '../../lib/websocket';
 import DriverRequest from './DriverRequest';
+import Toast, { useToast } from '../../components/Toast';
 
 interface DriverStats {
   ok: boolean;
@@ -21,6 +22,7 @@ export default function DriverDashboard() {
   const [pendingTrip, setPendingTrip] = useState<any>(null);
   const navigate = useNavigate();
 
+  const { toast, show: showToast, hide: hideToast } = useToast();
   const auth = JSON.parse(localStorage.getItem('tico_auth') || '{}');
   const userName = auth.user?.name || 'Conductor';
 
@@ -85,7 +87,7 @@ export default function DriverDashboard() {
       const res = await api.patch<{ ok: boolean; isAvailable: boolean }>('/driver/availability', { available: !isOnline });
       setIsOnline(res.isAvailable);
     } catch (err: any) {
-      alert(err.message || 'Error al cambiar disponibilidad');
+      showToast(err.message || 'Error al cambiar disponibilidad', 'error');
     }
   };
 
@@ -96,7 +98,7 @@ export default function DriverDashboard() {
         setShowRequest(false);
         navigate('/driver/trip', { state: { tripId: pendingTrip.id } });
       } catch (err: any) {
-        alert(err.message || 'Error al aceptar viaje');
+        showToast(err.message || 'Error al aceptar viaje', 'error');
         setShowRequest(false);
       }
     }
@@ -104,6 +106,7 @@ export default function DriverDashboard() {
 
   return (
     <div className="p-6 space-y-6">
+      <Toast message={toast.message} visible={toast.visible} onClose={hideToast} type={toast.type} />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-black text-tico-black">Hola, {userName.split(' ')[0]}</h1>

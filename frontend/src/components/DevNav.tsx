@@ -1,12 +1,10 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Car, ShieldAlert } from 'lucide-react';
 
 export default function DevNav() {
   const navigate = useNavigate();
 
-  const isDev = typeof window !== 'undefined' && localStorage.getItem('tico_dev') === 'true';
-  if (!isDev) return null;
+  if (!import.meta.env.DEV) return null;
 
   const switchRole = (role: 'passenger' | 'driver' | 'admin') => {
     localStorage.setItem('tico_auth', JSON.stringify({ role, phone: '999999999' }));

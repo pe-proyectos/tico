@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, CarFront, CheckCircle2, Loader2 } from 'lucide-react';
 import { api } from '../lib/api';
+import Toast, { useToast } from './Toast';
 
 export default function DriverMode({ onBack }: { onBack: () => void }) {
   const [step, setStep] = useState<'info' | 'form'>('info');
@@ -11,6 +12,7 @@ export default function DriverMode({ onBack }: { onBack: () => void }) {
   const [vehicleColor, setVehicleColor] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { toast, show: showToast, hide: hideToast } = useToast();
 
   const handleRegister = async () => {
     setLoading(true);
@@ -23,7 +25,7 @@ export default function DriverMode({ onBack }: { onBack: () => void }) {
       localStorage.setItem('tico_auth', JSON.stringify(auth));
       setTimeout(() => { window.location.href = '/driver'; }, 1500);
     } catch (err: any) {
-      alert(err.message || 'Error al registrar');
+      showToast(err.message || 'Error al registrar', 'error');
     } finally {
       setLoading(false);
     }
@@ -47,6 +49,7 @@ export default function DriverMode({ onBack }: { onBack: () => void }) {
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
       className="fixed inset-0 bg-tico-yellow z-50 overflow-y-auto flex flex-col"
     >
+      <Toast message={toast.message} visible={toast.visible} onClose={hideToast} type={toast.type} />
       <div className="pt-12 pb-4 px-6 sticky top-0 z-10 flex items-center gap-4">
         <button onClick={onBack} className="w-10 h-10 rounded-full bg-tico-black/10 flex items-center justify-center">
           <ArrowLeft className="w-6 h-6 text-tico-black" />
