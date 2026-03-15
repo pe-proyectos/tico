@@ -52,7 +52,7 @@ export default function DriverRequest() {
               <svg width="72" height="72" style={{ position: 'absolute', transform: 'rotate(-90deg)' }}>
                 <circle cx="36" cy="36" r="32" fill="none" stroke="var(--gray-100)" strokeWidth="4" />
                 <circle cx="36" cy="36" r="32" fill="none"
-                  stroke={countdown <= 5 ? 'var(--danger)' : 'var(--primary)'}
+                  stroke={countdown <= 5 ? 'var(--danger)' : 'var(--primary-blue)'}
                   strokeWidth="4" strokeLinecap="round"
                   strokeDasharray={`${2 * Math.PI * 32}`}
                   strokeDashoffset={`${2 * Math.PI * 32 * (pct / 100)}`}
@@ -64,7 +64,7 @@ export default function DriverRequest() {
                 color: countdown <= 5 ? 'var(--danger)' : 'var(--secondary)',
               }}>{countdown}</span>
             </div>
-            <h2 style={{ fontWeight: 700, fontSize: 20 }}>
+            <h2 style={{ fontWeight: 700, fontSize: 20, color: 'var(--gray-700)' }}>
               ¡Nueva solicitud!
             </h2>
           </div>
@@ -73,18 +73,18 @@ export default function DriverRequest() {
           <div style={{ marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 20 }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, paddingTop: 2 }}>
-                <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--success)' }} />
+                <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--primary-blue)' }} />
                 <div style={{ width: 2, height: 30, background: 'var(--gray-200)' }} />
                 <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--danger)' }} />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ marginBottom: 18 }}>
                   <p style={{ fontSize: 11, color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Origen</p>
-                  <p style={{ fontWeight: 600 }}>Parque Principal, Chiclayo</p>
+                  <p style={{ fontWeight: 600, color: 'var(--gray-700)' }}>Parque Principal, Chiclayo</p>
                 </div>
                 <div>
                   <p style={{ fontSize: 11, color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Destino</p>
-                  <p style={{ fontWeight: 600 }}>Real Plaza, Chiclayo</p>
+                  <p style={{ fontWeight: 600, color: 'var(--gray-700)' }}>Real Plaza, Chiclayo</p>
                 </div>
               </div>
             </div>
@@ -102,7 +102,7 @@ export default function DriverRequest() {
                 background: 'var(--gray-50)', borderRadius: 'var(--radius-sm)',
               }}>
                 <p style={{ fontSize: 11, color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Distancia</p>
-                <p style={{ fontWeight: 800, fontSize: 22 }}>2.3 km</p>
+                <p style={{ fontWeight: 800, fontSize: 22, color: 'var(--gray-700)' }}>2.3 km</p>
               </div>
             </div>
           </div>

@@ -64,14 +64,16 @@ export default function Home() {
         style={{ height: '100%', width: '100%', position: 'absolute', inset: 0 }}
       />
 
-      {/* Floating search card */}
+      {/* Floating search card - opaque white */}
       <div style={{
         position: 'absolute', top: 16, left: 16, right: 16, zIndex: 1000,
       }}>
-        <div className="glass" style={{
+        <div style={{
           borderRadius: 'var(--radius-lg)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.12)', padding: 16,
-          border: '1px solid rgba(255,255,255,0.6)',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.1)',
+          padding: 16,
+          background: '#FFFFFF',
+          border: '1px solid var(--gray-100)',
         }}>
           {/* Header with branding and user menu */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -94,7 +96,7 @@ export default function Home() {
               <div style={{ flex: 1, position: 'relative' }}>
                 <span style={{
                   position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
-                  color: 'var(--gray-400)', fontSize: 16, pointerEvents: 'none',
+                  color: 'var(--primary-blue)', fontSize: 16, pointerEvents: 'none',
                 }}>🔍</span>
                 <input
                   className="input"
@@ -132,7 +134,7 @@ export default function Home() {
                 background: 'var(--white)', border: 'none',
                 borderRadius: 'var(--radius-full)',
                 padding: '10px 16px', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap',
-                boxShadow: 'var(--shadow-md)', color: 'var(--secondary)',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.1)', color: 'var(--gray-600)',
                 transition: 'all 0.2s',
               }}>
                 📍 {place}
@@ -148,7 +150,7 @@ export default function Home() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
             <div>
               <p style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 2 }}>Destino</p>
-              <p style={{ fontWeight: 700, fontSize: 16 }}>{destination}</p>
+              <p style={{ fontWeight: 700, fontSize: 16, color: 'var(--gray-700)' }}>{destination}</p>
             </div>
             <div style={{ textAlign: 'right' }}>
               <p style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 2 }}>Precio estimado</p>
@@ -161,18 +163,18 @@ export default function Home() {
               background: 'var(--gray-50)', borderRadius: 'var(--radius-sm)',
             }}>
               <p style={{ fontSize: 12, color: 'var(--gray-400)', marginBottom: 2 }}>Distancia</p>
-              <p style={{ fontWeight: 700, fontSize: 16 }}>{trip.distance || 2.3} km</p>
+              <p style={{ fontWeight: 700, fontSize: 16, color: 'var(--gray-700)' }}>{trip.distance || 2.3} km</p>
             </div>
             <div style={{
               textAlign: 'center', flex: 1, padding: '10px',
               background: 'var(--gray-50)', borderRadius: 'var(--radius-sm)',
             }}>
               <p style={{ fontSize: 12, color: 'var(--gray-400)', marginBottom: 2 }}>Tiempo est.</p>
-              <p style={{ fontWeight: 700, fontSize: 16 }}>{trip.duration || 8} min</p>
+              <p style={{ fontWeight: 700, fontSize: 16, color: 'var(--gray-700)' }}>{trip.duration || 8} min</p>
             </div>
           </div>
           <button className="btn btn-primary" onClick={handleRequest} disabled={loading} style={{ fontSize: 16, fontWeight: 700 }}>
-            {loading ? <LoadingSpinner size={20} color="var(--secondary-deep)" /> : 'Buscar Taxista'}
+            {loading ? <LoadingSpinner size={20} color="#FFFFFF" /> : 'Buscar Taxista'}
           </button>
           <button className="btn btn-outline" onClick={() => { setShowPanel(false); setRoute(undefined) }} style={{ marginTop: 8 }}>
             Cancelar

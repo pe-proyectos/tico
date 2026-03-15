@@ -60,10 +60,10 @@ export default function ActiveTrip() {
         {/* Status pill */}
         <div style={{
           position: 'absolute', top: 60, left: '50%', transform: 'translateX(-50%)',
-          zIndex: 1000, background: 'var(--primary-gradient)',
+          zIndex: 1000, background: 'var(--blue-gradient)',
           padding: '6px 14px', borderRadius: 'var(--radius-full)',
-          fontSize: 12, fontWeight: 600, color: 'var(--secondary-deep)',
-          boxShadow: '0 4px 12px rgba(255,143,0,0.3)',
+          fontSize: 12, fontWeight: 600, color: '#FFFFFF',
+          boxShadow: '0 4px 12px rgba(26,54,93,0.3)',
         }}>
           🚕 En camino
         </div>
@@ -72,8 +72,8 @@ export default function ActiveTrip() {
       {/* Driver card */}
       <div style={{
         background: 'var(--white)', padding: 20,
-        boxShadow: '0 -4px 20px rgba(0,0,0,0.08)',
-        borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0',
+        boxShadow: '0 -4px 20px rgba(0,0,0,0.06)',
+        borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
           <div style={{
@@ -81,17 +81,17 @@ export default function ActiveTrip() {
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
           }}>👤</div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontWeight: 700, fontSize: 15 }}>{trip?.driver?.name || 'Pedro Ruiz'}</p>
+            <p style={{ fontWeight: 700, fontSize: 15, color: 'var(--gray-700)' }}>{trip?.driver?.name || 'Pedro Ruiz'}</p>
             <p style={{ fontSize: 13, color: 'var(--gray-500)' }}>
               {trip?.driver?.vehicle || 'Toyota Yaris Blanco'} · {trip?.driver?.plate || 'ABC-123'}
             </p>
           </div>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 3,
-            background: 'rgba(251,191,36,0.12)', padding: '4px 8px',
+            background: 'rgba(246,199,68,0.15)', padding: '4px 8px',
             borderRadius: 'var(--radius-full)', fontSize: 13, fontWeight: 600,
           }}>
-            <span style={{ color: '#FBBF24' }}>★</span>
+            <span style={{ color: '#E5B63A' }}>★</span>
             <span>{trip?.driver?.rating || 4.7}</span>
           </div>
         </div>
@@ -103,12 +103,12 @@ export default function ActiveTrip() {
         }}>
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 11, color: 'var(--gray-400)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Origen</p>
-            <p style={{ fontWeight: 500, fontSize: 13 }}>{trip?.origin?.address || 'Parque Principal'}</p>
+            <p style={{ fontWeight: 500, fontSize: 13, color: 'var(--gray-700)' }}>{trip?.origin?.address || 'Parque Principal'}</p>
           </div>
           <div style={{ width: 1, background: 'var(--gray-100)' }} />
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 11, color: 'var(--gray-400)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Destino</p>
-            <p style={{ fontWeight: 500, fontSize: 13 }}>{trip?.destination?.address || 'Real Plaza'}</p>
+            <p style={{ fontWeight: 500, fontSize: 13, color: 'var(--gray-700)' }}>{trip?.destination?.address || 'Real Plaza'}</p>
           </div>
           <div style={{ width: 1, background: 'var(--gray-100)' }} />
           <div style={{ textAlign: 'center' }}>
@@ -120,14 +120,14 @@ export default function ActiveTrip() {
         <div style={{ display: 'flex', gap: 10 }}>
           <a href="tel:105" style={{
             flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: 6, padding: '12px', borderRadius: 'var(--radius-md)',
-            background: 'var(--gray-50)', color: 'var(--danger)',
+            gap: 6, padding: '14px', borderRadius: 'var(--radius-md)',
+            background: 'rgba(229,62,62,0.06)', color: 'var(--danger)',
             fontSize: 13, fontWeight: 600, textDecoration: 'none',
-            border: '1px solid var(--gray-100)',
+            border: '1px solid rgba(229,62,62,0.15)',
           }}>
-            🚨 Emergencia
+            🆘 Emergencia
           </a>
-          <button className="btn btn-outline" style={{ flex: 1, minHeight: 'auto', padding: '12px' }}
+          <button className="btn btn-outline" style={{ flex: 1, minHeight: 'auto', padding: '14px' }}
             onClick={() => nav(`/trip/${id}/complete`)}>
             Simular llegada
           </button>

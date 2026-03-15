@@ -22,12 +22,12 @@ export default function UserMenu() {
     <div ref={ref} style={{ position: 'relative' }}>
       <button onClick={() => setOpen(!open)} style={{
         width: 34, height: 34, borderRadius: '50%',
-        background: 'var(--primary-gradient)',
+        background: 'var(--blue-gradient)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 14, fontWeight: 700, color: 'var(--secondary-deep)',
+        fontSize: 14, fontWeight: 700, color: '#FFFFFF',
         border: 'none', cursor: 'pointer', transition: 'transform 0.15s',
         transform: open ? 'scale(0.95)' : 'scale(1)',
-        boxShadow: '0 2px 8px rgba(255,143,0,0.25)',
+        boxShadow: '0 2px 8px rgba(26,54,93,0.25)',
       }}>
         {initial}
       </button>
@@ -40,7 +40,7 @@ export default function UserMenu() {
           border: '1px solid var(--gray-100)',
         }}>
           <div style={{ padding: '8px 16px 12px', borderBottom: '1px solid var(--gray-100)' }}>
-            <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--secondary)' }}>{user.name}</p>
+            <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--gray-700)' }}>{user.name}</p>
             <p style={{ fontSize: 12, color: 'var(--gray-400)', marginTop: 2 }}>+51 {user.phone}</p>
           </div>
           <button onClick={() => { setOpen(false); logout() }} style={{

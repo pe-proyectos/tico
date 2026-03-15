@@ -30,9 +30,10 @@ export default function BottomNav({ role }: { role: 'PASSENGER' | 'DRIVER' | 'AD
     <nav style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
       background: 'var(--white)',
-      boxShadow: '0 -1px 12px rgba(0,0,0,0.06)',
+      boxShadow: '0 -1px 12px rgba(0,0,0,0.04)',
       display: 'flex', justifyContent: 'space-around',
       padding: '8px 0 max(8px, env(safe-area-inset-bottom))',
+      borderTop: '1px solid var(--gray-100)',
     }}>
       {items.map(item => {
         const active = loc.pathname === item.path
@@ -41,7 +42,7 @@ export default function BottomNav({ role }: { role: 'PASSENGER' | 'DRIVER' | 'AD
             background: 'none',
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', gap: 4, padding: '6px 20px',
-            color: active ? 'var(--primary-dark)' : 'var(--gray-400)',
+            color: active ? 'var(--primary-blue)' : 'var(--gray-400)',
             fontSize: 11, fontWeight: active ? 600 : 400,
             transition: 'all 0.2s',
             position: 'relative',
@@ -52,7 +53,7 @@ export default function BottomNav({ role }: { role: 'PASSENGER' | 'DRIVER' | 'AD
               <div style={{
                 position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
                 width: 20, height: 3, borderRadius: 2,
-                background: 'var(--primary-gradient)',
+                background: 'var(--blue-gradient)',
               }} />
             )}
           </button>

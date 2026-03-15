@@ -5,7 +5,7 @@ export default function LoadingSpinner({ size = 40, color }: { size?: number; co
         width: size, height: size,
         borderRadius: '50%',
         border: `3px solid var(--gray-100)`,
-        borderTopColor: color || 'var(--primary-dark)',
+        borderTopColor: color || 'var(--primary-blue)',
         animation: 'spin 0.7s linear infinite',
       }} />
     </div>

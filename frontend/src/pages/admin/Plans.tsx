@@ -19,17 +19,17 @@ export default function AdminPlans() {
           {plans.map(p => (
             <div key={p.id} className="card">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700 }}>{p.name}</h3>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--gray-700)' }}>{p.name}</h3>
                 <span className="badge badge-info">{p.drivers} conductores</span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
                   <p style={{ fontSize: 12, color: 'var(--gray-400)', marginBottom: 2 }}>Precio</p>
-                  <p style={{ fontWeight: 700 }}>{p.price > 0 ? `S/ ${p.price}/mes` : 'Gratis'}</p>
+                  <p style={{ fontWeight: 700, color: 'var(--gray-700)' }}>{p.price > 0 ? `S/ ${p.price}/mes` : 'Gratis'}</p>
                 </div>
                 <div>
                   <p style={{ fontSize: 12, color: 'var(--gray-400)', marginBottom: 2 }}>Viajes/día</p>
-                  <p style={{ fontWeight: 700 }}>{p.maxTrips === -1 ? 'Ilimitados' : p.maxTrips}</p>
+                  <p style={{ fontWeight: 700, color: 'var(--gray-700)' }}>{p.maxTrips === -1 ? 'Ilimitados' : p.maxTrips}</p>
                 </div>
               </div>
             </div>
@@ -37,7 +37,7 @@ export default function AdminPlans() {
         </div>
 
         <div className="card" style={{ marginTop: 24, textAlign: 'center' }}>
-          <h3 style={{ fontWeight: 600, marginBottom: 8, fontSize: 15 }}>Resumen de ingresos por planes</h3>
+          <h3 style={{ fontWeight: 600, marginBottom: 8, fontSize: 15, color: 'var(--gray-700)' }}>Resumen de ingresos por planes</h3>
           <p style={{ fontSize: 30, fontWeight: 800, color: 'var(--success)' }}>
             S/ {(12 * 350 + 3 * 500).toLocaleString()}/mes
           </p>

@@ -13,7 +13,7 @@ export default function AdminDashboard() {
     <div className="page">
       <TopBar title="Admin" />
       <div className="page-content">
-        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>Dashboard</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16, color: 'var(--gray-700)' }}>Dashboard</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
           {stats.map(s => (
             <div key={s.label} className="card" style={{
@@ -33,7 +33,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="card">
-          <h3 style={{ fontWeight: 700, marginBottom: 12, fontSize: 15 }}>Actividad reciente</h3>
+          <h3 style={{ fontWeight: 700, marginBottom: 12, fontSize: 15, color: 'var(--gray-700)' }}>Actividad reciente</h3>
           {['Carlos pidió viaje a Real Plaza', 'Pedro aceptó solicitud', 'María completó viaje', 'Nuevo conductor registrado'].map((a, i) => (
             <div key={i} style={{
               padding: '12px 0',
@@ -43,7 +43,7 @@ export default function AdminDashboard() {
             }}>
               <span style={{
                 width: 6, height: 6, borderRadius: '50%',
-                background: 'var(--primary)', flexShrink: 0,
+                background: 'var(--primary-blue)', flexShrink: 0,
               }} />
               {a}
             </div>

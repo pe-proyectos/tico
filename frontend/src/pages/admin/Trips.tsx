@@ -29,11 +29,11 @@ export default function AdminTrips() {
             <tbody>
               {mockTrips.map(t => (
                 <tr key={t.id}>
-                  <td style={{ whiteSpace: 'nowrap' }}>{t.date}</td>
-                  <td>{t.passenger}</td>
-                  <td>{t.driver}</td>
-                  <td style={{ fontSize: 13 }}>{t.origin} → {t.destination}</td>
-                  <td style={{ fontWeight: 600 }}>S/ {t.price.toFixed(2)}</td>
+                  <td style={{ whiteSpace: 'nowrap', color: 'var(--gray-700)' }}>{t.date}</td>
+                  <td style={{ color: 'var(--gray-700)' }}>{t.passenger}</td>
+                  <td style={{ color: 'var(--gray-700)' }}>{t.driver}</td>
+                  <td style={{ fontSize: 13, color: 'var(--gray-600)' }}>{t.origin} → {t.destination}</td>
+                  <td style={{ fontWeight: 600, color: 'var(--gray-700)' }}>S/ {t.price.toFixed(2)}</td>
                   <td>
                     <span className={`badge ${t.status === 'COMPLETED' ? 'badge-success' : 'badge-danger'}`}>
                       {t.status === 'COMPLETED' ? 'Completado' : 'Cancelado'}

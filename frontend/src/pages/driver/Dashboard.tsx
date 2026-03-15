@@ -26,8 +26,8 @@ export default function DriverDashboard() {
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 16,
             padding: '16px 28px', borderRadius: 'var(--radius-lg)',
-            background: available ? 'rgba(34,197,94,0.08)' : 'var(--gray-50)',
-            border: `1.5px solid ${available ? 'rgba(34,197,94,0.2)' : 'var(--gray-200)'}`,
+            background: available ? 'rgba(56,161,105,0.06)' : 'var(--gray-50)',
+            border: `1.5px solid ${available ? 'rgba(56,161,105,0.2)' : 'var(--gray-200)'}`,
             transition: 'all 0.3s ease',
           }}>
             <span style={{ fontWeight: 600, fontSize: 15, color: available ? 'var(--success)' : 'var(--gray-500)' }}>
@@ -60,7 +60,7 @@ export default function DriverDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
           <div className="card" style={{ textAlign: 'center' }}>
             <p style={{ fontSize: 12, color: 'var(--gray-400)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Viajes hoy</p>
-            <p style={{ fontSize: 30, fontWeight: 800 }}>{stats.tripsToday}</p>
+            <p style={{ fontSize: 30, fontWeight: 800, color: 'var(--gray-700)' }}>{stats.tripsToday}</p>
           </div>
           <div className="card" style={{ textAlign: 'center' }}>
             <p style={{ fontSize: 12, color: 'var(--gray-400)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ganado hoy</p>
@@ -72,11 +72,11 @@ export default function DriverDashboard() {
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
           <div style={{
             width: 44, height: 44, borderRadius: 'var(--radius-sm)',
-            background: 'rgba(251,191,36,0.1)', display: 'flex',
+            background: 'rgba(246,199,68,0.1)', display: 'flex',
             alignItems: 'center', justifyContent: 'center', fontSize: 22,
           }}>⭐</div>
           <div>
-            <p style={{ fontWeight: 800, fontSize: 20 }}>{stats.rating}</p>
+            <p style={{ fontWeight: 800, fontSize: 20, color: 'var(--gray-700)' }}>{stats.rating}</p>
             <p style={{ fontSize: 13, color: 'var(--gray-400)' }}>Tu calificación</p>
           </div>
         </div>
@@ -84,7 +84,7 @@ export default function DriverDashboard() {
         {/* Plan badge */}
         <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <div>
-            <p style={{ fontWeight: 600, marginBottom: 4 }}>Plan actual</p>
+            <p style={{ fontWeight: 600, marginBottom: 4, color: 'var(--gray-700)' }}>Plan actual</p>
             <span className={`badge ${stats.plan === 'FREE' ? 'badge-neutral' : 'badge-success'}`}>
               {stats.plan}
             </span>

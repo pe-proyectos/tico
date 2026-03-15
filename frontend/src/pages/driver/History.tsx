@@ -38,7 +38,7 @@ export default function DriverHistory() {
         {/* Summary */}
         <div className="card" style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 16 }}>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: 28, fontWeight: 800 }}>{count}</p>
+            <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--gray-700)' }}>{count}</p>
             <p style={{ fontSize: 12, color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Viajes</p>
           </div>
           <div style={{ width: 1, background: 'var(--gray-100)' }} />
@@ -53,14 +53,14 @@ export default function DriverHistory() {
           {filtered.length === 0 && (
             <div style={{ textAlign: 'center', padding: '48px 16px' }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>🚕</div>
-              <p style={{ fontWeight: 600, fontSize: 16, color: 'var(--secondary)', marginBottom: 4 }}>No tienes viajes aún</p>
+              <p style={{ fontWeight: 600, fontSize: 16, color: 'var(--gray-700)', marginBottom: 4 }}>No tienes viajes aún</p>
               <p style={{ fontSize: 14, color: 'var(--gray-400)' }}>Tus viajes completados aparecerán aquí</p>
             </div>
           )}
           {filtered.map(t => (
             <div key={t.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 600, fontSize: 14, marginBottom: 2 }}>{t.origin} → {t.destination}</p>
+                <p style={{ fontWeight: 600, fontSize: 14, marginBottom: 2, color: 'var(--gray-700)' }}>{t.origin} → {t.destination}</p>
                 <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>
                   {new Date(t.date).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })} · {t.passengerName}
                 </p>
@@ -68,7 +68,7 @@ export default function DriverHistory() {
               <div style={{ textAlign: 'right' }}>
                 <p style={{ fontWeight: 700, color: 'var(--success)', fontSize: 15 }}>S/ {t.price.toFixed(2)}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'flex-end', fontSize: 12 }}>
-                  <span style={{ color: '#FBBF24' }}>★</span>
+                  <span style={{ color: '#E5B63A' }}>★</span>
                   <span style={{ color: 'var(--gray-400)' }}>{t.rating}</span>
                 </div>
               </div>

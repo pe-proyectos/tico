@@ -46,23 +46,23 @@ export default function Waiting() {
               <div style={{ position: 'relative', width: 72, height: 72, margin: '0 auto 20px' }}>
                 <div style={{
                   position: 'absolute', inset: 0, borderRadius: '50%',
-                  background: 'rgba(255,193,7,0.15)',
+                  background: 'rgba(26,54,93,0.1)',
                   animation: 'searchPulse 2s ease-in-out infinite',
                 }} />
                 <div style={{
                   position: 'absolute', inset: 0, borderRadius: '50%',
-                  background: 'rgba(255,193,7,0.15)',
+                  background: 'rgba(26,54,93,0.1)',
                   animation: 'searchPulse 2s ease-in-out infinite 0.5s',
                 }} />
                 <div style={{
                   position: 'relative', width: 72, height: 72, borderRadius: '50%',
-                  background: 'var(--primary-gradient)',
+                  background: 'var(--blue-gradient)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 32,
                 }}>🚕</div>
               </div>
-              <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>
-                Buscando taxista
+              <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6, color: 'var(--gray-700)' }}>
+                Buscando tu Tico...
               </h2>
               <p style={{ color: 'var(--gray-500)', marginBottom: 20, fontSize: 14 }}>
                 Conectándote con el conductor más cercano
@@ -76,12 +76,12 @@ export default function Waiting() {
               <div style={{ textAlign: 'center', marginBottom: 20 }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #22C55E, #16A34A)',
+                  background: 'linear-gradient(135deg, #38A169, #2F855A)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 22, color: 'white', margin: '0 auto 10px',
-                  boxShadow: '0 4px 12px rgba(34,197,94,0.3)',
+                  boxShadow: '0 4px 12px rgba(56,161,105,0.3)',
                 }}>✓</div>
-                <h2 style={{ fontSize: 18, fontWeight: 700 }}>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--gray-700)' }}>
                   ¡Taxista encontrado!
                 </h2>
               </div>
@@ -97,17 +97,17 @@ export default function Waiting() {
                   fontSize: 22,
                 }}>👤</div>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: 700, fontSize: 15 }}>{trip?.driver?.name || 'Pedro Ruiz'}</p>
+                  <p style={{ fontWeight: 700, fontSize: 15, color: 'var(--gray-700)' }}>{trip?.driver?.name || 'Pedro Ruiz'}</p>
                   <p style={{ fontSize: 13, color: 'var(--gray-500)' }}>
                     {trip?.driver?.vehicle || 'Toyota Yaris Blanco'} · {trip?.driver?.plate || 'ABC-123'}
                   </p>
                 </div>
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 3,
-                  background: 'rgba(251,191,36,0.12)', padding: '4px 8px',
+                  background: 'rgba(246,199,68,0.15)', padding: '4px 8px',
                   borderRadius: 'var(--radius-full)', fontSize: 13, fontWeight: 600,
                 }}>
-                  <span style={{ color: '#FBBF24' }}>★</span>
+                  <span style={{ color: '#E5B63A' }}>★</span>
                   <span>{trip?.driver?.rating || 4.7}</span>
                 </div>
               </div>

@@ -47,7 +47,7 @@ export default function AdminDrivers() {
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '48px 16px' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>👤</div>
-            <p style={{ fontWeight: 600, fontSize: 16, color: 'var(--secondary)', marginBottom: 4 }}>
+            <p style={{ fontWeight: 600, fontSize: 16, color: 'var(--gray-700)', marginBottom: 4 }}>
               {filter === 'PENDING' ? 'No hay conductores pendientes' : 'No hay conductores'}
             </p>
             <p style={{ fontSize: 14, color: 'var(--gray-400)' }}>
@@ -70,10 +70,10 @@ export default function AdminDrivers() {
               {filtered.map(d => (
                 <tr key={d.id}>
                   <td>
-                    <p style={{ fontWeight: 600 }}>{d.name}</p>
+                    <p style={{ fontWeight: 600, color: 'var(--gray-700)' }}>{d.name}</p>
                     <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>{d.phone}</p>
                   </td>
-                  <td style={{ fontWeight: 600 }}>{d.plate}</td>
+                  <td style={{ fontWeight: 600, color: 'var(--gray-700)' }}>{d.plate}</td>
                   <td><span className="badge badge-neutral">{d.plan}</span></td>
                   <td><span className={`badge ${statusBadge[d.status]}`}>{statusLabel[d.status]}</span></td>
                   <td>

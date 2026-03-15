@@ -15,10 +15,10 @@ export default function StarRating({ value, onChange, size = 32, readonly = fals
           style={{
             fontSize: size,
             cursor: readonly ? 'default' : 'pointer',
-            color: i <= value ? '#FBBF24' : 'var(--gray-200)',
+            color: i <= value ? '#E5B63A' : 'var(--gray-200)',
             transition: 'all 0.15s ease',
             transform: i <= value ? 'scale(1.1)' : 'scale(1)',
-            filter: i <= value ? 'drop-shadow(0 2px 4px rgba(251,191,36,0.4))' : 'none',
+            filter: i <= value ? 'drop-shadow(0 2px 4px rgba(229,182,58,0.4))' : 'none',
           }}
         >
           ★
