@@ -47,7 +47,10 @@ export const tripRoutes = new Elysia({ prefix: "/api/trips" })
 
   .get("/:id", async ({ params, user, set }) => {
     if (!requireAuth(set, user)) return { error: "Unauthorized" };
-    const trip = await prisma.trip.findUnique({ where: { id: params.id } });
+    const trip = await prisma.trip.findUnique({
+      where: { id: params.id },
+      include: { passenger: true, driver: { include: { driver: true } } },
+    });
     if (!trip) { set.status = 404; return { error: "Trip not found" }; }
     return { ok: true, trip };
   })

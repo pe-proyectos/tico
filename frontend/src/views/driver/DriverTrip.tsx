@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { MapPin, Navigation, Phone, MessageSquare, CheckCircle2 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
@@ -10,8 +10,25 @@ type TripPhase = 'picking_up' | 'waiting' | 'en_route' | 'completed';
 export default function DriverTrip() {
   const [phase, setPhase] = useState<TripPhase>('picking_up');
   const [earnings, setEarnings] = useState(0);
+  const [tripData, setTripData] = useState<any>(null);
   const location = useLocation();
   const tripId = (location.state as any)?.tripId;
+
+  useEffect(() => {
+    if (!tripId) return;
+    api.get<{ ok: boolean; trip: any }>(`/trips/${tripId}`)
+      .then(res => {
+        setTripData(res.trip);
+        // Set phase based on current status
+        const statusPhaseMap: Record<string, TripPhase> = {
+          ACCEPTED: 'picking_up', DRIVER_ARRIVING: 'waiting', IN_PROGRESS: 'en_route', COMPLETED: 'completed',
+        };
+        if (res.trip?.status && statusPhaseMap[res.trip.status]) {
+          setPhase(statusPhaseMap[res.trip.status]);
+        }
+      })
+      .catch(() => {});
+  }, [tripId]);
 
   const handleNextPhase = async () => {
     try {
@@ -81,9 +98,11 @@ export default function DriverTrip() {
         <div className="bg-white rounded-[32px] p-6 shadow-2xl">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <img src="https://picsum.photos/seed/passenger/100/100" alt="Pasajero" className="w-14 h-14 rounded-full object-cover" referrerPolicy="no-referrer" />
+              <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold">
+                {(tripData?.passenger?.name || 'P').charAt(0)}
+              </div>
               <div>
-                <h3 className="font-bold text-tico-black text-lg">Pasajero</h3>
+                <h3 className="font-bold text-tico-black text-lg">{tripData?.passenger?.name || 'Pasajero'}</h3>
                 <p className="text-gray-500 font-medium text-sm">Pago en efectivo</p>
               </div>
             </div>
@@ -106,7 +125,7 @@ export default function DriverTrip() {
                 {phase === 'en_route' ? 'Destino' : 'Punto de recogida'}
               </p>
               <p className="font-bold text-tico-black truncate">
-                {phase === 'en_route' ? 'Destino del pasajero' : 'Punto de recogida'}
+                {phase === 'en_route' ? (tripData?.destAddress || 'Destino') : (tripData?.originAddress || 'Punto de recogida')}
               </p>
             </div>
           </div>

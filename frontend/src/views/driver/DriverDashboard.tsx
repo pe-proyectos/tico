@@ -120,6 +120,7 @@ export default function DriverDashboard() {
 
       {showRequest && pendingTrip && (
         <DriverRequest 
+          trip={pendingTrip}
           onAccept={handleAcceptRequest} 
           onReject={() => { setShowRequest(false); setPendingTrip(null); }} 
         />

@@ -1,9 +1,30 @@
 import { motion } from 'motion/react';
 import { Star, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
+import { api } from '../../lib/api';
 
-export default function TripComplete({ onDone }: { onDone: () => void }) {
+interface TripCompleteProps {
+  tripId: string | null;
+  trip: any;
+  onDone: () => void;
+}
+
+export default function TripComplete({ tripId, trip, onDone }: TripCompleteProps) {
   const [rating, setRating] = useState(0);
+  const [rated, setRated] = useState(false);
+
+  const price = trip?.finalPrice || trip?.estimatedPrice || 0;
+  const driverName = trip?.driver?.name || 'tu conductor';
+
+  const handleRate = async (stars: number) => {
+    setRating(stars);
+    if (tripId && !rated) {
+      try {
+        await api.post(`/trips/${tripId}/rate`, { stars });
+        setRated(true);
+      } catch {}
+    }
+  };
 
   return (
     <motion.div 
@@ -21,27 +42,31 @@ export default function TripComplete({ onDone }: { onDone: () => void }) {
       <div className="bg-gray-50 rounded-3xl p-6 w-full max-w-sm mb-8">
         <h2 className="text-sm font-bold text-gray-400 uppercase mb-4">Resumen del Viaje</h2>
         
-        <div className="flex justify-between items-center mb-4">
-          <span className="font-medium text-gray-600">Tiempo</span>
-          <span className="font-bold text-tico-black">15 min</span>
-        </div>
-        <div className="flex justify-between items-center mb-4">
-          <span className="font-medium text-gray-600">Distancia</span>
-          <span className="font-bold text-tico-black">4.2 km</span>
-        </div>
+        {trip?.originAddress && (
+          <div className="flex justify-between items-center mb-4">
+            <span className="font-medium text-gray-600">Origen</span>
+            <span className="font-bold text-tico-black text-sm truncate ml-2 max-w-[60%] text-right">{trip.originAddress}</span>
+          </div>
+        )}
+        {trip?.destAddress && (
+          <div className="flex justify-between items-center mb-4">
+            <span className="font-medium text-gray-600">Destino</span>
+            <span className="font-bold text-tico-black text-sm truncate ml-2 max-w-[60%] text-right">{trip.destAddress}</span>
+          </div>
+        )}
         <div className="flex justify-between items-center pt-4 border-t border-gray-200">
           <span className="font-medium text-gray-600">Total pagado</span>
-          <span className="font-black text-2xl text-tico-black">S/ 12.00</span>
+          <span className="font-black text-2xl text-tico-black">S/ {price.toFixed(2)}</span>
         </div>
       </div>
 
       <div className="w-full max-w-sm mb-8">
-        <h2 className="text-lg font-bold text-tico-black mb-4">¿Cómo calificarías a Carlos?</h2>
+        <h2 className="text-lg font-bold text-tico-black mb-4">¿Cómo calificarías a {driverName}?</h2>
         <div className="flex justify-center gap-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <button 
               key={star} 
-              onClick={() => setRating(star)}
+              onClick={() => handleRate(star)}
               className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center hover:bg-tico-yellow/20 transition-colors"
             >
               <Star className={`w-6 h-6 ${rating >= star ? 'fill-tico-yellow text-tico-yellow' : 'text-gray-400'}`} />

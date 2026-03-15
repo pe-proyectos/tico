@@ -81,6 +81,7 @@ export const driverRoutes = new Elysia({ prefix: "/api" })
       where: { status: "SEARCHING" },
       orderBy: { createdAt: "desc" },
       take: 20,
+      include: { passenger: true },
     });
     return { ok: true, trips };
   })
@@ -116,6 +117,7 @@ export const driverRoutes = new Elysia({ prefix: "/api" })
     const updated = await prisma.trip.update({
       where: { id: params.id },
       data: { driverId: user.id, status: "ACCEPTED", acceptedAt: new Date() },
+      include: { passenger: true, driver: { include: { driver: true } } },
     });
     return { ok: true, trip: updated };
   })

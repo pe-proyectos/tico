@@ -2,7 +2,13 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MapPin, Navigation, X } from 'lucide-react';
 
-export default function DriverRequest({ onAccept, onReject }: { onAccept: () => void, onReject: () => void }) {
+interface DriverRequestProps {
+  trip?: any;
+  onAccept: () => void;
+  onReject: () => void;
+}
+
+export default function DriverRequest({ trip, onAccept, onReject }: DriverRequestProps) {
   const [timeLeft, setTimeLeft] = useState(15);
 
   useEffect(() => {
@@ -15,6 +21,10 @@ export default function DriverRequest({ onAccept, onReject }: { onAccept: () => 
   }, [timeLeft, onReject]);
 
   const progress = (timeLeft / 15) * 100;
+  const price = trip?.estimatedPrice || 15;
+  const origin = trip?.originAddress || 'Punto de recogida';
+  const dest = trip?.destAddress || 'Destino';
+  const passengerName = trip?.passenger?.name || 'Pasajero';
 
   return (
     <AnimatePresence>
@@ -37,8 +47,8 @@ export default function DriverRequest({ onAccept, onReject }: { onAccept: () => 
 
           <div className="flex justify-between items-start mt-4 mb-6">
             <div>
-              <h2 className="text-2xl font-black text-tico-black">S/ 15.00</h2>
-              <p className="text-gray-500 font-medium">Pago en efectivo</p>
+              <h2 className="text-2xl font-black text-tico-black">S/ {price.toFixed(2)}</h2>
+              <p className="text-gray-500 font-medium">Pago en efectivo • {passengerName}</p>
             </div>
             
             {/* Circular Countdown */}
@@ -63,8 +73,7 @@ export default function DriverRequest({ onAccept, onReject }: { onAccept: () => 
               </div>
               <div>
                 <p className="text-xs font-bold text-gray-400 uppercase">Recoger en</p>
-                <p className="font-bold text-tico-black">Real Plaza Chiclayo</p>
-                <p className="text-sm text-gray-500">A 2.5 km (5 min)</p>
+                <p className="font-bold text-tico-black">{origin}</p>
               </div>
             </div>
 
@@ -74,8 +83,7 @@ export default function DriverRequest({ onAccept, onReject }: { onAccept: () => 
               </div>
               <div>
                 <p className="text-xs font-bold text-gray-400 uppercase">Dejar en</p>
-                <p className="font-bold text-tico-black">USAT</p>
-                <p className="text-sm text-gray-500">Viaje de 15 min</p>
+                <p className="font-bold text-tico-black">{dest}</p>
               </div>
             </div>
           </div>

@@ -24,26 +24,33 @@ export default function PassengerApp() {
   const [orderState, setOrderState] = useState<'idle' | 'negotiating' | 'accepted' | 'completed'>('idle');
   const [proposedPrice, setProposedPrice] = useState<number>(0);
   const [selectedDriver, setSelectedDriver] = useState<any>(null);
+  const [currentTripId, setCurrentTripId] = useState<string | null>(null);
+  const [currentTrip, setCurrentTrip] = useState<any>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleRequest = (price: number) => {
-    setProposedPrice(price);
+  const handleTripCreated = (trip: any) => {
+    setProposedPrice(trip.estimatedPrice || 0);
+    setCurrentTripId(trip.id);
+    setCurrentTrip(trip);
     setOrderState('negotiating');
   };
 
   const handleCancel = () => {
     setOrderState('idle');
     setSelectedDriver(null);
+    setCurrentTripId(null);
+    setCurrentTrip(null);
   };
 
-  const handleSelectDriver = (driver: any) => {
-    setSelectedDriver(driver);
+  const handleDriverAccepted = (trip: any) => {
+    setSelectedDriver(trip.driver);
+    setCurrentTrip(trip);
     setOrderState('accepted');
-    // Simulate trip completion after 5 seconds for demo purposes
-    setTimeout(() => {
-      setOrderState('completed');
-    }, 5000);
+  };
+
+  const handleTripCompleted = () => {
+    setOrderState('completed');
   };
 
   const handleLogout = () => {
@@ -92,19 +99,19 @@ export default function PassengerApp() {
         {view === 'editProfile' && <EditProfile key="editProfile" onBack={() => setView('profile')} />}
 
         {view === 'home' && orderState === 'idle' && (
-          <OrderPanel key="order-panel" onRequest={handleRequest} />
+          <OrderPanel key="order-panel" onTripCreated={handleTripCreated} />
         )}
         
-        {view === 'home' && orderState === 'negotiating' && (
-          <DriverList key="driver-list" proposedPrice={proposedPrice} onCancel={handleCancel} onSelectDriver={handleSelectDriver} />
+        {view === 'home' && orderState === 'negotiating' && currentTripId && (
+          <DriverList key="driver-list" tripId={currentTripId} proposedPrice={proposedPrice} onCancel={handleCancel} onDriverAccepted={handleDriverAccepted} />
         )}
 
-        {view === 'home' && orderState === 'accepted' && selectedDriver && (
-          <TripActive key="trip-active" driver={selectedDriver} onCancel={handleCancel} />
+        {view === 'home' && orderState === 'accepted' && currentTripId && (
+          <TripActive key="trip-active" tripId={currentTripId} driver={selectedDriver} onCancel={handleCancel} onCompleted={handleTripCompleted} />
         )}
 
         {view === 'home' && orderState === 'completed' && (
-          <TripComplete key="trip-complete" onDone={handleCancel} />
+          <TripComplete key="trip-complete" tripId={currentTripId} trip={currentTrip} onDone={handleCancel} />
         )}
       </AnimatePresence>
     </div>

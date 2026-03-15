@@ -1,23 +1,56 @@
 import { motion } from 'motion/react';
 import { Star, ShieldCheck, Phone, MessageSquare, X } from 'lucide-react';
-
-interface Driver {
-  id: string;
-  name: string;
-  photo: string;
-  car: string;
-  rating: number;
-  price: number;
-  time: string;
-  plate: string;
-}
+import { useEffect, useState } from 'react';
+import { api } from '../lib/api';
 
 interface TripActiveProps {
-  driver: Driver;
+  tripId: string;
+  driver: any;
   onCancel: () => void;
+  onCompleted: () => void;
 }
 
-export default function TripActive({ driver, onCancel }: TripActiveProps) {
+export default function TripActive({ tripId, driver, onCancel, onCompleted }: TripActiveProps) {
+  const [tripData, setTripData] = useState<any>(null);
+  const [cancelling, setCancelling] = useState(false);
+
+  const driverUser = tripData?.driver || driver;
+  const driverProfile = driverUser?.driver || driverUser;
+
+  useEffect(() => {
+    const poll = setInterval(() => {
+      api.get<{ ok: boolean; trip: any }>(`/trips/${tripId}`)
+        .then(res => {
+          setTripData(res.trip);
+          if (res.trip?.status === 'COMPLETED') {
+            onCompleted();
+          } else if (res.trip?.status === 'CANCELLED') {
+            onCancel();
+          }
+        })
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(poll);
+  }, [tripId]);
+
+  const handleCancel = async () => {
+    setCancelling(true);
+    try {
+      await api.post(`/trips/${tripId}/cancel`);
+      onCancel();
+    } catch (err: any) {
+      alert(err.message || 'Error al cancelar');
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  const driverName = driverUser?.name || 'Conductor';
+  const driverRating = driverUser?.rating || 0;
+  const vehicleInfo = driverProfile ? `${driverProfile.vehicleBrand || ''} ${driverProfile.vehicleModel || ''} ${driverProfile.vehicleColor || ''}`.trim() : 'Vehículo';
+  const plate = driverProfile?.licensePlate || '';
+  const statusText = tripData?.status === 'IN_PROGRESS' ? 'En camino al destino' : tripData?.status === 'DRIVER_ARRIVING' ? 'Conductor llegando' : 'Conductor en camino';
+
   return (
     <motion.div 
       initial={{ y: "100%" }}
@@ -30,33 +63,37 @@ export default function TripActive({ driver, onCancel }: TripActiveProps) {
         <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-5"></div>
         
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-tico-black">Conductor en camino</h2>
+          <h2 className="text-xl font-bold text-tico-black">{statusText}</h2>
           <div className="bg-tico-black text-white px-3 py-1 rounded-full text-sm font-bold">
-            {driver.time}
+            ~5 min
           </div>
         </div>
 
         <div className="flex items-center gap-4 mb-6">
           <div className="relative">
-            <img src={driver.photo} alt={driver.name} className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm" referrerPolicy="no-referrer" />
+            <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center border-2 border-white shadow-sm">
+              <span className="text-2xl">{driverName.charAt(0)}</span>
+            </div>
             <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
               <ShieldCheck className="w-5 h-5 text-green-500" />
             </div>
           </div>
           
           <div className="flex-1">
-            <h3 className="font-bold text-tico-black text-lg">{driver.name}</h3>
+            <h3 className="font-bold text-tico-black text-lg">{driverName}</h3>
             <div className="flex items-center gap-1 mb-1">
               <Star className="w-4 h-4 fill-tico-yellow text-tico-yellow" />
-              <span className="text-sm font-bold text-tico-black">{driver.rating}</span>
+              <span className="text-sm font-bold text-tico-black">{driverRating.toFixed(1)}</span>
             </div>
-            <p className="text-sm text-gray-500">{driver.car}</p>
+            <p className="text-sm text-gray-500">{vehicleInfo}</p>
           </div>
 
-          <div className="bg-gray-100 px-3 py-2 rounded-xl text-center border border-gray-200">
-            <span className="block text-xs text-gray-500 font-medium mb-0.5">Placa</span>
-            <span className="block font-bold text-tico-black">{driver.plate}</span>
-          </div>
+          {plate && (
+            <div className="bg-gray-100 px-3 py-2 rounded-xl text-center border border-gray-200">
+              <span className="block text-xs text-gray-500 font-medium mb-0.5">Placa</span>
+              <span className="block font-bold text-tico-black">{plate}</span>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3 mb-6">
@@ -70,10 +107,11 @@ export default function TripActive({ driver, onCancel }: TripActiveProps) {
 
         <div className="flex gap-3">
           <button 
-            onClick={onCancel}
-            className="flex-[2] bg-red-50 text-red-600 font-bold text-lg py-4 rounded-2xl active:scale-[0.98] transition-transform"
+            onClick={handleCancel}
+            disabled={cancelling}
+            className="flex-[2] bg-red-50 text-red-600 font-bold text-lg py-4 rounded-2xl active:scale-[0.98] transition-transform disabled:opacity-50"
           >
-            Cancelar viaje
+            {cancelling ? 'Cancelando...' : 'Cancelar viaje'}
           </button>
           <button 
             onClick={() => alert('Llamando a emergencias (105)...')}

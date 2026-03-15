@@ -61,7 +61,10 @@ export default function DriverPlans() {
               ))}
             </div>
 
-            <button className={`w-full py-4 rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform ${plan.buttonColor}`}>
+            <button 
+              onClick={() => alert('Contacta a soporte para cambiar de plan')}
+              className={`w-full py-4 rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform ${plan.buttonColor}`}
+            >
               Seleccionar Plan
             </button>
           </div>

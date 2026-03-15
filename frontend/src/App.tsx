@@ -15,9 +15,38 @@ import AdminPlans from './views/admin/AdminPlans';
 import DevNav from './components/DevNav';
 
 function AuthGuard({ children, allowedRole }: { children: React.ReactNode, allowedRole: string }) {
+  const [checked, setChecked] = useState(false);
+  const [valid, setValid] = useState(false);
   const authStr = localStorage.getItem('tico_auth');
-  if (!authStr) return <Navigate to="/login" replace />;
-  
+
+  useEffect(() => {
+    if (!authStr) { setChecked(true); return; }
+    try {
+      const auth = JSON.parse(authStr);
+      if (!auth.token) { setChecked(true); return; }
+      fetch('/api/auth/me', { headers: { Authorization: `Bearer ${auth.token}` } })
+        .then(r => { if (!r.ok) throw new Error(); setValid(true); setChecked(true); })
+        .catch(() => { localStorage.removeItem('tico_auth'); setChecked(true); });
+    } catch { setChecked(true); }
+  }, []);
+
+  if (!checked) return null;
+  if (!authStr || !valid) {
+    // Allow DevNav bypass: if tico_auth exists but token validation skipped (no token), still allow
+    try {
+      const auth = JSON.parse(authStr || '{}');
+      if (auth.role) {
+        if (auth.role !== allowedRole) {
+          if (auth.role === 'admin') return <Navigate to="/admin" replace />;
+          if (auth.role === 'driver') return <Navigate to="/driver" replace />;
+          return <Navigate to="/" replace />;
+        }
+        return <>{children}</>;
+      }
+    } catch {}
+    return <Navigate to="/login" replace />;
+  }
+
   try {
     const auth = JSON.parse(authStr);
     if (auth.role !== allowedRole) {
