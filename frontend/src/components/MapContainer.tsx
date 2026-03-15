@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { MapContainer as LeafletMap, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -8,13 +8,24 @@ interface MapContainerProps {
   origin?: [number, number];
   destination?: [number, number];
   routeCoords?: [number, number][];
+  userLocation?: [number, number];
+  driverLocation?: [number, number];
 }
+
+const CHICLAYO_CENTER: [number, number] = [-6.7714, -79.8409];
 
 const markerA = L.divIcon({
   className: '',
   html: '<div style="background:#1d4ed8;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3)">A</div>',
   iconSize: [28, 28],
   iconAnchor: [14, 14],
+});
+
+const markerCar = L.divIcon({
+  className: '',
+  html: '<div style="background:#f59e0b;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3)">🚕</div>',
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
 });
 
 const markerB = L.divIcon({
@@ -24,9 +35,10 @@ const markerB = L.divIcon({
   iconAnchor: [14, 14],
 });
 
-function FitBounds({ origin, destination, routeCoords }: { origin?: [number, number]; destination?: [number, number]; routeCoords?: [number, number][] }) {
+function FitBounds({ origin, destination, routeCoords, userLocation }: { origin?: [number, number]; destination?: [number, number]; routeCoords?: [number, number][]; userLocation?: [number, number] }) {
   const map = useMap();
   const fitted = useRef(false);
+  const centeredOnUser = useRef(false);
 
   useEffect(() => {
     if (routeCoords && routeCoords.length > 1) {
@@ -38,16 +50,23 @@ function FitBounds({ origin, destination, routeCoords }: { origin?: [number, num
       map.fitBounds(bounds, { padding: [60, 60] });
       fitted.current = true;
     } else if (fitted.current) {
-      map.setView([-6.7714, -79.8409], 15);
+      map.setView(userLocation || CHICLAYO_CENTER, 15);
       fitted.current = false;
     }
-  }, [origin, destination, routeCoords, map]);
+  }, [origin, destination, routeCoords, map, userLocation]);
+
+  useEffect(() => {
+    if (userLocation && !fitted.current && !centeredOnUser.current) {
+      map.setView(userLocation, 15);
+      centeredOnUser.current = true;
+    }
+  }, [userLocation, map]);
 
   return null;
 }
 
-export default function MapContainer({ origin, destination, routeCoords }: MapContainerProps) {
-  const center: [number, number] = [-6.7714, -79.8409];
+export default function MapContainer({ origin, destination, routeCoords, userLocation, driverLocation }: MapContainerProps) {
+  const center: [number, number] = userLocation || CHICLAYO_CENTER;
   const hasRoute = origin && destination;
 
   return (
@@ -62,15 +81,15 @@ export default function MapContainer({ origin, destination, routeCoords }: MapCo
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
-        <FitBounds origin={origin} destination={destination} routeCoords={routeCoords} />
+        <FitBounds origin={origin} destination={destination} routeCoords={routeCoords} userLocation={userLocation} />
         {origin && <Marker position={origin} icon={markerA} />}
         {destination && <Marker position={destination} icon={markerB} />}
+        {driverLocation && <Marker position={driverLocation} icon={markerCar} />}
         {routeCoords && routeCoords.length > 1 && (
           <Polyline positions={routeCoords} pathOptions={{ color: '#1d1d1d', weight: 5, opacity: 0.8 }} />
         )}
       </LeafletMap>
 
-      {/* Center Marker Overlay - only show when no route */}
       {!hasRoute && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none z-[400]">
           <div className="bg-tico-black text-white text-xs font-bold px-3 py-1.5 rounded-full mb-1 shadow-lg">

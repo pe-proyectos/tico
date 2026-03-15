@@ -7,6 +7,7 @@ import DriverDashboard from './views/driver/DriverDashboard';
 import DriverTrip from './views/driver/DriverTrip';
 import DriverHistory from './views/driver/DriverHistory';
 import DriverPlans from './views/driver/DriverPlans';
+import DriverVehicle from './views/driver/DriverVehicle';
 import AdminLayout from './views/admin/AdminLayout';
 import AdminDashboard from './views/admin/AdminDashboard';
 import AdminDrivers from './views/admin/AdminDrivers';
@@ -115,6 +116,7 @@ export default function App() {
           <Route path="trip" element={<DriverTrip />} />
           <Route path="history" element={<DriverHistory />} />
           <Route path="plans" element={<DriverPlans />} />
+          <Route path="vehicle" element={<DriverVehicle />} />
         </Route>
 
         {/* Admin Routes */}

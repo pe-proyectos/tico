@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Search, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Clock, X, Star } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { api } from '../../lib/api';
 
 interface DriverRecord {
   id: string;
   licensePlate: string;
+  vehicleBrand?: string;
+  vehicleModel?: string;
+  vehicleColor?: string;
   status: string;
   planType: string;
   user: { id: string; name: string; phone: string; rating: number };
@@ -13,6 +17,8 @@ interface DriverRecord {
 export default function AdminDrivers() {
   const [filter, setFilter] = useState('todos');
   const [drivers, setDrivers] = useState<DriverRecord[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDriver, setSelectedDriver] = useState<DriverRecord | null>(null);
 
   const fetchDrivers = () => {
     const statusParam = filter === 'todos' ? '' : `?status=${filter.toUpperCase()}`;
@@ -34,13 +40,25 @@ export default function AdminDrivers() {
     APPROVED: 'aprobado', PENDING: 'pendiente', REJECTED: 'rechazado', SUSPENDED: 'suspendido',
   };
 
+  const filteredDrivers = drivers.filter(d => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return d.user.name?.toLowerCase().includes(q) || d.user.phone?.includes(q);
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-tico-black">Gestión de Conductores</h2>
         <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-100 flex items-center gap-2">
           <Search className="w-5 h-5 text-gray-400 ml-2" />
-          <input type="text" placeholder="Buscar conductor..." className="outline-none bg-transparent px-2 py-1" />
+          <input
+            type="text"
+            placeholder="Buscar conductor..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="outline-none bg-transparent px-2 py-1"
+          />
         </div>
       </div>
 
@@ -73,9 +91,9 @@ export default function AdminDrivers() {
             </tr>
           </thead>
           <tbody>
-            {drivers.length === 0 ? (
+            {filteredDrivers.length === 0 ? (
               <tr><td colSpan={6} className="p-8 text-center text-gray-400">No hay conductores</td></tr>
-            ) : drivers.map((driver) => {
+            ) : filteredDrivers.map((driver) => {
               const st = statusMap[driver.status] || driver.status;
               return (
                 <tr key={driver.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
@@ -105,7 +123,7 @@ export default function AdminDrivers() {
                       </>
                     )}
                     {driver.status !== 'PENDING' && (
-                      <button className="px-3 py-1 bg-gray-100 text-gray-600 text-sm font-bold rounded-lg hover:bg-gray-200">Ver Perfil</button>
+                      <button onClick={() => setSelectedDriver(driver)} className="px-3 py-1 bg-gray-100 text-gray-600 text-sm font-bold rounded-lg hover:bg-gray-200">Ver Perfil</button>
                     )}
                   </td>
                 </tr>
@@ -114,6 +132,72 @@ export default function AdminDrivers() {
           </tbody>
         </table>
       </div>
+
+      {/* Driver Profile Modal */}
+      <AnimatePresence>
+        {selectedDriver && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6"
+            onClick={() => setSelectedDriver(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white rounded-3xl p-6 max-w-md w-full shadow-xl"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-tico-black">Perfil del Conductor</h3>
+                <button onClick={() => setSelectedDriver(null)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold text-gray-500">
+                  {(selectedDriver.user.name || 'C').charAt(0)}
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg text-tico-black">{selectedDriver.user.name || 'Sin nombre'}</h4>
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 fill-tico-yellow text-tico-yellow" />
+                    <span className="text-sm font-bold">{selectedDriver.user.rating?.toFixed(1) || '0.0'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <InfoRow label="Teléfono" value={selectedDriver.user.phone} />
+                <InfoRow label="Placa" value={selectedDriver.licensePlate} />
+                <InfoRow label="Vehículo" value={`${selectedDriver.vehicleBrand || ''} ${selectedDriver.vehicleModel || ''}`.trim() || '-'} />
+                <InfoRow label="Color" value={selectedDriver.vehicleColor || '-'} />
+                <InfoRow label="Plan" value={selectedDriver.planType} />
+                <InfoRow label="Estado" value={statusMap[selectedDriver.status] || selectedDriver.status} />
+              </div>
+
+              <button
+                onClick={() => setSelectedDriver(null)}
+                className="w-full mt-6 bg-tico-black text-white font-bold py-3 rounded-2xl"
+              >
+                Cerrar
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between items-center py-2 border-b border-gray-50">
+      <span className="text-sm text-gray-500 font-medium">{label}</span>
+      <span className="text-sm font-bold text-tico-black">{value}</span>
     </div>
   );
 }

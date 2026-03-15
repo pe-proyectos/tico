@@ -16,6 +16,7 @@ interface TripRecord {
 
 export default function AdminTrips() {
   const [trips, setTrips] = useState<TripRecord[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     api.get<{ ok: boolean; trips: TripRecord[] }>('/admin/trips')
@@ -34,13 +35,31 @@ export default function AdminTrips() {
 
   const formatDate = (d: string) => new Date(d).toLocaleString('es-PE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
+  const filteredTrips = trips.filter(t => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    const statusLabel = statusMap[t.status]?.label?.toLowerCase() || t.status.toLowerCase();
+    return (
+      t.id.toLowerCase().includes(q) ||
+      t.passenger?.name?.toLowerCase().includes(q) ||
+      t.driver?.name?.toLowerCase().includes(q) ||
+      statusLabel.includes(q)
+    );
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-tico-black">Historial de Viajes</h2>
         <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-100 flex items-center gap-2">
           <Search className="w-5 h-5 text-gray-400 ml-2" />
-          <input type="text" placeholder="Buscar viaje..." className="outline-none bg-transparent px-2 py-1" />
+          <input
+            type="text"
+            placeholder="Buscar viaje..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="outline-none bg-transparent px-2 py-1"
+          />
         </div>
       </div>
 
@@ -57,9 +76,9 @@ export default function AdminTrips() {
             </tr>
           </thead>
           <tbody>
-            {trips.length === 0 ? (
+            {filteredTrips.length === 0 ? (
               <tr><td colSpan={6} className="p-8 text-center text-gray-400">No hay viajes registrados</td></tr>
-            ) : trips.map((trip) => {
+            ) : filteredTrips.map((trip) => {
               const st = statusMap[trip.status] || { label: trip.status, color: 'bg-gray-100 text-gray-600' };
               return (
                 <tr key={trip.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">

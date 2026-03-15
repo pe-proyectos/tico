@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Map as MapIcon, Clock, CreditCard } from 'lucide-react';
+import { Home, Map as MapIcon, Clock, CreditCard, Car } from 'lucide-react';
 
 export default function DriverLayout() {
   const location = useLocation();
@@ -8,6 +8,7 @@ export default function DriverLayout() {
     { path: '/driver', icon: Home, label: 'Inicio' },
     { path: '/driver/trip', icon: MapIcon, label: 'Viaje' },
     { path: '/driver/history', icon: Clock, label: 'Historial' },
+    { path: '/driver/vehicle', icon: Car, label: 'Vehículo' },
     { path: '/driver/plans', icon: CreditCard, label: 'Planes' },
   ];
 

@@ -1,6 +1,29 @@
-import { CheckCircle2, Star } from 'lucide-react';
+import { CheckCircle2, Star, MessageCircle, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { api } from '../../lib/api';
 
 export default function DriverPlans() {
+  const [showBanner, setShowBanner] = useState(false);
+  const [upgrading, setUpgrading] = useState<string | null>(null);
+  const [successPlan, setSuccessPlan] = useState<string | null>(null);
+  const [error, setError] = useState('');
+
+  const handleUpgrade = async (planName: string) => {
+    setUpgrading(planName);
+    setError('');
+    try {
+      await api.post('/driver/upgrade-plan', { plan: planName });
+      setSuccessPlan(planName);
+      setTimeout(() => setSuccessPlan(null), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Error al cambiar plan');
+      setShowBanner(true);
+    } finally {
+      setUpgrading(null);
+    }
+  };
+
   const plans = [
     {
       name: 'FREE',
@@ -33,7 +56,7 @@ export default function DriverPlans() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 pb-32">
       <h1 className="text-2xl font-black text-tico-black">Planes de Conductor</h1>
       <p className="text-gray-500 font-medium">Elige el plan que mejor se adapte a tus necesidades. Tú te quedas con el 100% de cada viaje.</p>
 
@@ -62,14 +85,53 @@ export default function DriverPlans() {
             </div>
 
             <button 
-              onClick={() => alert('Contacta a soporte para cambiar de plan')}
-              className={`w-full py-4 rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform ${plan.buttonColor}`}
+              onClick={() => handleUpgrade(plan.name)}
+              disabled={upgrading === plan.name}
+              className={`w-full py-4 rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform disabled:opacity-70 ${
+                successPlan === plan.name ? 'bg-green-500 text-white' : plan.buttonColor
+              }`}
             >
-              Seleccionar Plan
+              {upgrading === plan.name ? (
+                <span className="flex items-center justify-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Procesando...</span>
+              ) : successPlan === plan.name ? (
+                <span className="flex items-center justify-center gap-2"><CheckCircle2 className="w-5 h-5" /> ¡Plan activado!</span>
+              ) : 'Seleccionar Plan'}
             </button>
           </div>
         ))}
       </div>
+
+      <AnimatePresence>
+        {showBanner && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-0 left-0 right-0 bg-green-600 text-white p-5 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.2)]"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <MessageCircle className="w-6 h-6 shrink-0" />
+              <p className="font-bold">Para cambiar de plan, contáctanos por WhatsApp</p>
+            </div>
+            <div className="flex gap-3">
+              <a
+                href="https://wa.me/51987654321?text=Quiero%20cambiar%20mi%20plan%20Tico"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-white text-green-600 font-bold py-3 rounded-2xl text-center active:scale-[0.98] transition-transform"
+              >
+                Abrir WhatsApp
+              </a>
+              <button
+                onClick={() => setShowBanner(false)}
+                className="px-4 py-3 rounded-2xl border-2 border-white/30 font-bold active:scale-[0.98] transition-transform"
+              >
+                Cerrar
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

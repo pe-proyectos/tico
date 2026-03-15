@@ -35,7 +35,16 @@ export default function PassengerApp() {
   const [currentTrip, setCurrentTrip] = useState<any>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [routeData, setRouteData] = useState<RouteData | null>(null);
+  const [userLocation, setUserLocation] = useState<[number, number] | undefined>();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
+      () => {},
+      { timeout: 5000 }
+    );
+  }, []);
 
   const handleTripCreated = async (trip: any) => {
     setProposedPrice(trip.estimatedPrice || 0);
@@ -85,7 +94,8 @@ export default function PassengerApp() {
       <MapContainer 
         origin={routeData?.origin} 
         destination={routeData?.destination} 
-        routeCoords={routeData?.routeCoords} 
+        routeCoords={routeData?.routeCoords}
+        userLocation={userLocation}
       />
       
       <Sidebar 

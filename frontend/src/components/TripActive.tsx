@@ -2,6 +2,8 @@ import { motion } from 'motion/react';
 import { Star, ShieldCheck, Phone, MessageSquare, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
+import { wsManager } from '../lib/websocket';
+import Toast, { useToast } from './Toast';
 
 interface TripActiveProps {
   tripId: string;
@@ -13,6 +15,8 @@ interface TripActiveProps {
 export default function TripActive({ tripId, driver, onCancel, onCompleted }: TripActiveProps) {
   const [tripData, setTripData] = useState<any>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [driverLocation, setDriverLocation] = useState<[number, number] | null>(null);
+  const { toast, show: showToast, hide: hideToast } = useToast();
 
   const driverUser = tripData?.driver || driver;
   const driverProfile = driverUser?.driver || driverUser;
@@ -30,7 +34,29 @@ export default function TripActive({ tripId, driver, onCancel, onCompleted }: Tr
         })
         .catch(() => {});
     }, 5000);
-    return () => clearInterval(poll);
+    // WebSocket listener
+    wsManager.connect();
+    const unsub = wsManager.onTripUpdate((data: any) => {
+      if (data.tripId === tripId || data.trip?.id === tripId) {
+        const status = data.status || data.trip?.status;
+        if (data.trip) setTripData(data.trip);
+        if (status === 'COMPLETED') onCompleted();
+        else if (status === 'CANCELLED') onCancel();
+        if (data.driverLocation) setDriverLocation([data.driverLocation.lat, data.driverLocation.lng]);
+      }
+    });
+
+    return () => { clearInterval(poll); unsub(); };
+  }, [tripId]);
+
+  // Poll driver location
+  useEffect(() => {
+    const pollLoc = setInterval(() => {
+      api.get<{ ok: boolean; lat: number; lng: number }>(`/trips/${tripId}/driver-location`)
+        .then(res => { if (res.lat && res.lng) setDriverLocation([res.lat, res.lng]); })
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(pollLoc);
   }, [tripId]);
 
   const handleCancel = async () => {
@@ -39,7 +65,7 @@ export default function TripActive({ tripId, driver, onCancel, onCompleted }: Tr
       await api.post(`/trips/${tripId}/cancel`);
       onCancel();
     } catch (err: any) {
-      alert(err.message || 'Error al cancelar');
+      showToast(err.message || 'Error al cancelar', 'error');
     } finally {
       setCancelling(false);
     }
@@ -47,9 +73,33 @@ export default function TripActive({ tripId, driver, onCancel, onCompleted }: Tr
 
   const driverName = driverUser?.name || 'Conductor';
   const driverRating = driverUser?.rating || 0;
+  const driverPhone = driverUser?.phone || driverProfile?.phone || '';
   const vehicleInfo = driverProfile ? `${driverProfile.vehicleBrand || ''} ${driverProfile.vehicleModel || ''} ${driverProfile.vehicleColor || ''}`.trim() : 'Vehículo';
   const plate = driverProfile?.licensePlate || '';
   const statusText = tripData?.status === 'IN_PROGRESS' ? 'En camino al destino' : tripData?.status === 'DRIVER_ARRIVING' ? 'Conductor llegando' : 'Conductor en camino';
+
+  const eta = tripData?.estimatedDuration
+    ? `~${Math.ceil(tripData.estimatedDuration)} min`
+    : tripData?.distance
+      ? `~${Math.max(1, Math.ceil(tripData.distance / 500))} min`
+      : 'Calculando...';
+
+  const handleCall = () => {
+    if (driverPhone) {
+      window.location.href = `tel:${driverPhone}`;
+    } else {
+      showToast('Teléfono no disponible', 'info');
+    }
+  };
+
+  const handleMessage = () => {
+    if (driverPhone) {
+      const cleanPhone = driverPhone.replace(/\+/g, '');
+      window.open(`https://wa.me/${cleanPhone}`, '_blank');
+    } else {
+      showToast('Teléfono no disponible', 'info');
+    }
+  };
 
   return (
     <motion.div 
@@ -59,13 +109,14 @@ export default function TripActive({ tripId, driver, onCancel, onCompleted }: Tr
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
       className="absolute bottom-0 left-0 right-0 z-30 p-4 pb-8"
     >
+      <Toast message={toast.message} visible={toast.visible} onClose={hideToast} type={toast.type} />
       <div className="glass-panel rounded-3xl p-5 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
         <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-5"></div>
         
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-tico-black">{statusText}</h2>
           <div className="bg-tico-black text-white px-3 py-1 rounded-full text-sm font-bold">
-            ~5 min
+            {eta}
           </div>
         </div>
 
@@ -97,10 +148,10 @@ export default function TripActive({ tripId, driver, onCancel, onCompleted }: Tr
         </div>
 
         <div className="flex gap-3 mb-6">
-          <button className="flex-1 bg-gray-100 hover:bg-gray-200 text-tico-black font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-colors">
+          <button onClick={handleCall} className="flex-1 bg-gray-100 hover:bg-gray-200 text-tico-black font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-colors">
             <Phone className="w-5 h-5" /> Llamar
           </button>
-          <button className="flex-1 bg-gray-100 hover:bg-gray-200 text-tico-black font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-colors">
+          <button onClick={handleMessage} className="flex-1 bg-gray-100 hover:bg-gray-200 text-tico-black font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-colors">
             <MessageSquare className="w-5 h-5" /> Mensaje
           </button>
         </div>
@@ -114,7 +165,7 @@ export default function TripActive({ tripId, driver, onCancel, onCompleted }: Tr
             {cancelling ? 'Cancelando...' : 'Cancelar viaje'}
           </button>
           <button 
-            onClick={() => alert('Llamando a emergencias (105)...')}
+            onClick={() => { window.location.href = 'tel:105'; }}
             className="flex-1 bg-red-600 text-white font-bold text-lg py-4 rounded-2xl active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
           >
             🆘 105

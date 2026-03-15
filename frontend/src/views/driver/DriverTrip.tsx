@@ -4,6 +4,7 @@ import { MapPin, Navigation, Phone, MessageSquare, CheckCircle2 } from 'lucide-r
 import { useLocation } from 'react-router-dom';
 import MapContainer from '../../components/MapContainer';
 import { api } from '../../lib/api';
+import Toast, { useToast } from '../../components/Toast';
 
 type TripPhase = 'picking_up' | 'waiting' | 'en_route' | 'completed';
 
@@ -13,13 +14,13 @@ export default function DriverTrip() {
   const [tripData, setTripData] = useState<any>(null);
   const location = useLocation();
   const tripId = (location.state as any)?.tripId;
+  const { toast, show: showToast, hide: hideToast } = useToast();
 
   useEffect(() => {
     if (!tripId) return;
     api.get<{ ok: boolean; trip: any }>(`/trips/${tripId}`)
       .then(res => {
         setTripData(res.trip);
-        // Set phase based on current status
         const statusPhaseMap: Record<string, TripPhase> = {
           ACCEPTED: 'picking_up', DRIVER_ARRIVING: 'waiting', IN_PROGRESS: 'en_route', COMPLETED: 'completed',
         };
@@ -29,6 +30,25 @@ export default function DriverTrip() {
       })
       .catch(() => {});
   }, [tripId]);
+
+  const passengerPhone = tripData?.passenger?.phone || '';
+
+  const handleCall = () => {
+    if (passengerPhone) {
+      window.location.href = `tel:${passengerPhone}`;
+    } else {
+      showToast('Teléfono no disponible', 'info');
+    }
+  };
+
+  const handleMessage = () => {
+    if (passengerPhone) {
+      const cleanPhone = passengerPhone.replace(/\+/g, '');
+      window.open(`https://wa.me/${cleanPhone}`, '_blank');
+    } else {
+      showToast('Teléfono no disponible', 'info');
+    }
+  };
 
   const handleNextPhase = async () => {
     try {
@@ -46,7 +66,7 @@ export default function DriverTrip() {
         setPhase('completed');
       }
     } catch (err: any) {
-      alert(err.message || 'Error');
+      showToast(err.message || 'Error', 'error');
     }
   };
 
@@ -71,6 +91,7 @@ export default function DriverTrip() {
 
   return (
     <div className="relative w-full h-[100dvh] overflow-hidden bg-gray-100">
+      <Toast message={toast.message} visible={toast.visible} onClose={hideToast} type={toast.type} />
       <div className="absolute inset-0 z-0">
         <MapContainer />
       </div>
@@ -107,10 +128,10 @@ export default function DriverTrip() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center active:scale-95 transition-transform">
+              <button onClick={handleMessage} className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center active:scale-95 transition-transform">
                 <MessageSquare className="w-5 h-5 text-tico-black" />
               </button>
-              <button className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center active:scale-95 transition-transform">
+              <button onClick={handleCall} className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center active:scale-95 transition-transform">
                 <Phone className="w-5 h-5 text-green-600" />
               </button>
             </div>

@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { Star, ShieldCheck, X } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { api } from '../lib/api';
+import { wsManager } from '../lib/websocket';
 
 interface DriverListProps {
   tripId: string;
@@ -34,7 +35,22 @@ export default function DriverList({ tripId, proposedPrice, onCancel, onDriverAc
     };
 
     pollRef.current = setInterval(poll, 3000);
-    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+
+    // WebSocket listener (faster than polling)
+    wsManager.connect();
+    const unsub = wsManager.onTripUpdate((data: any) => {
+      if (data.tripId === tripId || data.trip?.id === tripId) {
+        const status = data.status || data.trip?.status;
+        if (status === 'ACCEPTED' || status === 'DRIVER_ARRIVING' || status === 'IN_PROGRESS') {
+          setSearching(false);
+          onDriverAccepted(data.trip || data);
+        } else if (status === 'CANCELLED') {
+          onCancel();
+        }
+      }
+    });
+
+    return () => { if (pollRef.current) clearInterval(pollRef.current); unsub(); };
   }, [tripId]);
 
   const handleRetry = () => {

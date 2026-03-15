@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Power, Activity, DollarSign, Star, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
+import { wsManager } from '../../lib/websocket';
 import DriverRequest from './DriverRequest';
 
 interface DriverStats {
@@ -40,6 +41,44 @@ export default function DriverDashboard() {
     }, 5000);
     return () => clearInterval(poll);
   }, [isOnline, showRequest]);
+
+  // WebSocket: listen for new trip requests
+  useEffect(() => {
+    if (!isOnline) return;
+    wsManager.connect();
+    const unsub = wsManager.onTripUpdate((data: any) => {
+      if (data.type === 'NEW_REQUEST' && data.trip && !showRequest) {
+        setPendingTrip(data.trip);
+        setShowRequest(true);
+      }
+    });
+    return () => { unsub(); };
+  }, [isOnline, showRequest]);
+
+  // Send driver location when online
+  useEffect(() => {
+    if (!isOnline) return;
+    let watchId: number | null = null;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+    let lastLat = 0, lastLng = 0;
+
+    if ('geolocation' in navigator) {
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => { lastLat = pos.coords.latitude; lastLng = pos.coords.longitude; },
+        () => {},
+        { enableHighAccuracy: true }
+      );
+      intervalId = setInterval(() => {
+        if (lastLat && lastLng) {
+          api.post('/driver/location', { lat: lastLat, lng: lastLng }).catch(() => {});
+        }
+      }, 10000);
+    }
+    return () => {
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isOnline]);
 
   const toggleOnline = async () => {
     try {
