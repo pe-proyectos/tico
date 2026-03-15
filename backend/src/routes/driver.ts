@@ -27,6 +27,42 @@ export const driverRoutes = new Elysia({ prefix: "/api" })
     return { user };
   })
 
+  .post("/driver/register", async ({ body, user, set }) => {
+    if (!user) { set.status = 401; return { error: "Unauthorized" }; }
+    if (user.driver) { set.status = 400; return { error: "Already registered as driver" }; }
+    const driver = await prisma.driver.create({
+      data: {
+        userId: user.id,
+        licensePlate: body.licensePlate,
+        vehicleBrand: body.vehicleBrand,
+        vehicleModel: body.vehicleModel,
+        vehicleColor: body.vehicleColor,
+      },
+    });
+    await prisma.user.update({ where: { id: user.id }, data: { role: "DRIVER" } });
+    return { ok: true, driver };
+  }, {
+    body: t.Object({
+      licensePlate: t.String(),
+      vehicleBrand: t.String(),
+      vehicleModel: t.String(),
+      vehicleColor: t.String(),
+    })
+  })
+
+  .get("/driver/history", async ({ user, set }) => {
+    if (!requireDriver(set, user)) return { error: "Forbidden" };
+    const trips = await prisma.trip.findMany({
+      where: { driverId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+    const earnings = trips
+      .filter(t => t.status === "COMPLETED")
+      .reduce((sum, t) => sum + (t.finalPrice || t.estimatedPrice), 0);
+    return { ok: true, trips, earnings: Math.round(earnings * 100) / 100 };
+  })
+
   .patch("/driver/availability", async ({ body, user, set }) => {
     if (!requireDriver(set, user)) return { error: "Forbidden" };
     if (user.driver.status !== "APPROVED") { set.status = 403; return { error: "Driver not approved" }; }

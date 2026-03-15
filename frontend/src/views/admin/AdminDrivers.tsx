@@ -1,17 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { api } from '../../lib/api';
+
+interface DriverRecord {
+  id: string;
+  licensePlate: string;
+  status: string;
+  planType: string;
+  user: { id: string; name: string; phone: string; rating: number };
+}
 
 export default function AdminDrivers() {
   const [filter, setFilter] = useState('todos');
+  const [drivers, setDrivers] = useState<DriverRecord[]>([]);
 
-  const drivers = [
-    { id: 'D001', name: 'Carlos Mendoza', phone: '+51 987654321', status: 'aprobado', rating: 4.8, plan: 'PRO' },
-    { id: 'D002', name: 'Ana Torres', phone: '+51 912345678', status: 'pendiente', rating: 0, plan: 'FREE' },
-    { id: 'D003', name: 'Luis Rojas', phone: '+51 998877665', status: 'rechazado', rating: 0, plan: 'FREE' },
-    { id: 'D004', name: 'María Silva', phone: '+51 945612378', status: 'aprobado', rating: 4.9, plan: 'BUSINESS' },
-  ];
+  const fetchDrivers = () => {
+    const statusParam = filter === 'todos' ? '' : `?status=${filter.toUpperCase()}`;
+    api.get<{ ok: boolean; drivers: DriverRecord[] }>(`/admin/drivers${statusParam}`)
+      .then(res => setDrivers(res.drivers || []))
+      .catch(() => {});
+  };
 
-  const filteredDrivers = drivers.filter(d => filter === 'todos' || d.status === filter);
+  useEffect(() => { fetchDrivers(); }, [filter]);
+
+  const handleAction = async (driverId: string, status: string) => {
+    try {
+      await api.patch(`/admin/drivers/${driverId}`, { status });
+      fetchDrivers();
+    } catch {}
+  };
+
+  const statusMap: Record<string, string> = {
+    APPROVED: 'aprobado', PENDING: 'pendiente', REJECTED: 'rechazado', SUSPENDED: 'suspendido',
+  };
 
   return (
     <div className="space-y-6">
@@ -23,72 +44,73 @@ export default function AdminDrivers() {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="flex gap-2">
-        {['todos', 'pendientes', 'aprobados', 'rechazados'].map((f) => (
+        {['todos', 'PENDING', 'APPROVED', 'REJECTED'].map((f) => (
           <button
             key={f}
-            onClick={() => setFilter(f.replace('s', ''))}
+            onClick={() => setFilter(f)}
             className={`px-4 py-2 rounded-full text-sm font-bold capitalize transition-colors ${
-              (filter === f || filter === f.replace('s', ''))
+              filter === f
                 ? 'bg-tico-black text-white'
                 : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
             }`}
           >
-            {f}
+            {f === 'todos' ? 'Todos' : statusMap[f] || f}
           </button>
         ))}
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-100">
-              <th className="p-4 font-semibold text-gray-600">ID</th>
               <th className="p-4 font-semibold text-gray-600">Nombre</th>
               <th className="p-4 font-semibold text-gray-600">Teléfono</th>
+              <th className="p-4 font-semibold text-gray-600">Placa</th>
               <th className="p-4 font-semibold text-gray-600">Plan</th>
               <th className="p-4 font-semibold text-gray-600">Estado</th>
               <th className="p-4 font-semibold text-gray-600 text-right">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {filteredDrivers.map((driver) => (
-              <tr key={driver.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                <td className="p-4 font-mono text-sm text-gray-500">{driver.id}</td>
-                <td className="p-4 font-bold text-tico-black">{driver.name}</td>
-                <td className="p-4 text-gray-600">{driver.phone}</td>
-                <td className="p-4">
-                  <span className="bg-gray-100 text-tico-black text-xs font-bold px-2 py-1 rounded-md">
-                    {driver.plan}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full w-max ${
-                    driver.status === 'aprobado' ? 'bg-green-100 text-green-700' :
-                    driver.status === 'pendiente' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-red-100 text-red-700'
-                  }`}>
-                    {driver.status === 'aprobado' && <CheckCircle className="w-3 h-3" />}
-                    {driver.status === 'pendiente' && <Clock className="w-3 h-3" />}
-                    {driver.status === 'rechazado' && <XCircle className="w-3 h-3" />}
-                    <span className="capitalize">{driver.status}</span>
-                  </span>
-                </td>
-                <td className="p-4 text-right space-x-2">
-                  {driver.status === 'pendiente' && (
-                    <>
-                      <button className="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-lg hover:bg-green-600">Aprobar</button>
-                      <button className="px-3 py-1 bg-red-500 text-white text-sm font-bold rounded-lg hover:bg-red-600">Rechazar</button>
-                    </>
-                  )}
-                  {driver.status !== 'pendiente' && (
-                    <button className="px-3 py-1 bg-gray-100 text-gray-600 text-sm font-bold rounded-lg hover:bg-gray-200">Ver Perfil</button>
-                  )}
-                </td>
-              </tr>
-            ))}
+            {drivers.length === 0 ? (
+              <tr><td colSpan={6} className="p-8 text-center text-gray-400">No hay conductores</td></tr>
+            ) : drivers.map((driver) => {
+              const st = statusMap[driver.status] || driver.status;
+              return (
+                <tr key={driver.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                  <td className="p-4 font-bold text-tico-black">{driver.user.name || 'Sin nombre'}</td>
+                  <td className="p-4 text-gray-600">{driver.user.phone}</td>
+                  <td className="p-4 font-mono text-sm text-gray-500">{driver.licensePlate}</td>
+                  <td className="p-4">
+                    <span className="bg-gray-100 text-tico-black text-xs font-bold px-2 py-1 rounded-md">{driver.planType}</span>
+                  </td>
+                  <td className="p-4">
+                    <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full w-max ${
+                      st === 'aprobado' ? 'bg-green-100 text-green-700' :
+                      st === 'pendiente' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      {st === 'aprobado' && <CheckCircle className="w-3 h-3" />}
+                      {st === 'pendiente' && <Clock className="w-3 h-3" />}
+                      {st === 'rechazado' && <XCircle className="w-3 h-3" />}
+                      <span className="capitalize">{st}</span>
+                    </span>
+                  </td>
+                  <td className="p-4 text-right space-x-2">
+                    {driver.status === 'PENDING' && (
+                      <>
+                        <button onClick={() => handleAction(driver.id, 'APPROVED')} className="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-lg hover:bg-green-600">Aprobar</button>
+                        <button onClick={() => handleAction(driver.id, 'REJECTED')} className="px-3 py-1 bg-red-500 text-white text-sm font-bold rounded-lg hover:bg-red-600">Rechazar</button>
+                      </>
+                    )}
+                    {driver.status !== 'PENDING' && (
+                      <button className="px-3 py-1 bg-gray-100 text-gray-600 text-sm font-bold rounded-lg hover:bg-gray-200">Ver Perfil</button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

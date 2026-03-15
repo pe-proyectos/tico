@@ -1,12 +1,38 @@
+import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
+import { api } from '../../lib/api';
+
+interface TripRecord {
+  id: string;
+  createdAt: string;
+  originAddress: string;
+  destAddress: string;
+  estimatedPrice: number;
+  finalPrice: number | null;
+  status: string;
+  passenger: { name: string; phone: string };
+  driver: { name: string; phone: string } | null;
+}
 
 export default function AdminTrips() {
-  const trips = [
-    { id: 'T1042', date: '15 Mar, 14:30', passenger: 'Juan Pérez', driver: 'Carlos M.', route: 'Real Plaza → USAT', price: 'S/ 12.00', status: 'En curso' },
-    { id: 'T1041', date: '15 Mar, 14:15', passenger: 'María S.', driver: 'Ana T.', route: 'Terminal → Centro', price: 'S/ 8.00', status: 'Completado' },
-    { id: 'T1040', date: '15 Mar, 13:50', passenger: 'Luis R.', driver: '-', route: 'Hospital → Open Plaza', price: 'S/ 15.00', status: 'Cancelado' },
-    { id: 'T1039', date: '15 Mar, 13:20', passenger: 'Elena G.', driver: 'Pedro L.', route: 'Aeropuerto → Pimentel', price: 'S/ 25.00', status: 'Completado' },
-  ];
+  const [trips, setTrips] = useState<TripRecord[]>([]);
+
+  useEffect(() => {
+    api.get<{ ok: boolean; trips: TripRecord[] }>('/admin/trips')
+      .then(res => setTrips(res.trips || []))
+      .catch(() => {});
+  }, []);
+
+  const statusMap: Record<string, { label: string; color: string }> = {
+    COMPLETED: { label: 'Completado', color: 'bg-green-100 text-green-700' },
+    IN_PROGRESS: { label: 'En curso', color: 'bg-blue-100 text-blue-700' },
+    SEARCHING: { label: 'Buscando', color: 'bg-yellow-100 text-yellow-700' },
+    ACCEPTED: { label: 'Aceptado', color: 'bg-blue-100 text-blue-700' },
+    CANCELLED: { label: 'Cancelado', color: 'bg-red-100 text-red-700' },
+    DRIVER_ARRIVING: { label: 'En camino', color: 'bg-purple-100 text-purple-700' },
+  };
+
+  const formatDate = (d: string) => new Date(d).toLocaleString('es-PE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
   return (
     <div className="space-y-6">
@@ -22,7 +48,6 @@ export default function AdminTrips() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-100">
-              <th className="p-4 font-semibold text-gray-600">ID Viaje</th>
               <th className="p-4 font-semibold text-gray-600">Fecha/Hora</th>
               <th className="p-4 font-semibold text-gray-600">Pasajero</th>
               <th className="p-4 font-semibold text-gray-600">Conductor</th>
@@ -32,25 +57,23 @@ export default function AdminTrips() {
             </tr>
           </thead>
           <tbody>
-            {trips.map((trip) => (
-              <tr key={trip.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                <td className="p-4 font-mono text-sm text-gray-500">{trip.id}</td>
-                <td className="p-4 text-sm text-gray-600">{trip.date}</td>
-                <td className="p-4 font-bold text-tico-black">{trip.passenger}</td>
-                <td className="p-4 text-gray-600">{trip.driver}</td>
-                <td className="p-4 text-sm text-gray-600 truncate max-w-[200px]">{trip.route}</td>
-                <td className="p-4 font-bold text-tico-black">{trip.price}</td>
-                <td className="p-4">
-                  <span className={`text-xs font-bold px-2 py-1 rounded-md ${
-                    trip.status === 'Completado' ? 'bg-green-100 text-green-700' :
-                    trip.status === 'En curso' ? 'bg-blue-100 text-blue-700' :
-                    'bg-red-100 text-red-700'
-                  }`}>
-                    {trip.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
+            {trips.length === 0 ? (
+              <tr><td colSpan={6} className="p-8 text-center text-gray-400">No hay viajes registrados</td></tr>
+            ) : trips.map((trip) => {
+              const st = statusMap[trip.status] || { label: trip.status, color: 'bg-gray-100 text-gray-600' };
+              return (
+                <tr key={trip.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                  <td className="p-4 text-sm text-gray-600">{formatDate(trip.createdAt)}</td>
+                  <td className="p-4 font-bold text-tico-black">{trip.passenger?.name || 'Pasajero'}</td>
+                  <td className="p-4 text-gray-600">{trip.driver?.name || '-'}</td>
+                  <td className="p-4 text-sm text-gray-600 truncate max-w-[200px]">{trip.originAddress} → {trip.destAddress}</td>
+                  <td className="p-4 font-bold text-tico-black">S/ {(trip.finalPrice || trip.estimatedPrice).toFixed(2)}</td>
+                  <td className="p-4">
+                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${st.color}`}>{st.label}</span>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

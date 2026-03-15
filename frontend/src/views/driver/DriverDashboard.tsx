@@ -1,33 +1,74 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Power, Activity, DollarSign, Star, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../../lib/api';
 import DriverRequest from './DriverRequest';
+
+interface DriverStats {
+  ok: boolean;
+  tripsToday: number;
+  earnings: number;
+  planType: string;
+  limit: number;
+}
 
 export default function DriverDashboard() {
   const [isOnline, setIsOnline] = useState(false);
   const [showRequest, setShowRequest] = useState(false);
+  const [stats, setStats] = useState<DriverStats | null>(null);
+  const [pendingTrip, setPendingTrip] = useState<any>(null);
   const navigate = useNavigate();
 
-  const handleSimulateRequest = () => {
-    if (!isOnline) {
-      alert("Debes estar conectado para recibir solicitudes.");
-      return;
+  const auth = JSON.parse(localStorage.getItem('tico_auth') || '{}');
+  const userName = auth.user?.name || 'Conductor';
+
+  useEffect(() => {
+    api.get<DriverStats>('/driver/stats').then(setStats).catch(() => {});
+  }, []);
+
+  // Poll for requests when online
+  useEffect(() => {
+    if (!isOnline) return;
+    const poll = setInterval(() => {
+      api.get<{ ok: boolean; trips: any[] }>('/driver/requests').then(res => {
+        if (res.trips?.length > 0 && !showRequest) {
+          setPendingTrip(res.trips[0]);
+          setShowRequest(true);
+        }
+      }).catch(() => {});
+    }, 5000);
+    return () => clearInterval(poll);
+  }, [isOnline, showRequest]);
+
+  const toggleOnline = async () => {
+    try {
+      const res = await api.patch<{ ok: boolean; isAvailable: boolean }>('/driver/availability', { available: !isOnline });
+      setIsOnline(res.isAvailable);
+    } catch (err: any) {
+      alert(err.message || 'Error al cambiar disponibilidad');
     }
-    setShowRequest(true);
   };
 
-  const handleAcceptRequest = () => {
-    setShowRequest(false);
-    navigate('/driver/trip');
+  const handleAcceptRequest = async () => {
+    if (pendingTrip) {
+      try {
+        await api.post(`/trips/${pendingTrip.id}/accept`);
+        setShowRequest(false);
+        navigate('/driver/trip', { state: { tripId: pendingTrip.id } });
+      } catch (err: any) {
+        alert(err.message || 'Error al aceptar viaje');
+        setShowRequest(false);
+      }
+    }
   };
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-black text-tico-black">Hola, Carlos</h1>
-          <p className="text-gray-500 font-medium">Plan <span className="text-tico-black font-bold bg-tico-yellow/20 px-2 py-0.5 rounded-md">PRO</span></p>
+          <h1 className="text-2xl font-black text-tico-black">Hola, {userName.split(' ')[0]}</h1>
+          <p className="text-gray-500 font-medium">Plan <span className="text-tico-black font-bold bg-tico-yellow/20 px-2 py-0.5 rounded-md">{stats?.planType || 'FREE'}</span></p>
         </div>
         <button 
           onClick={() => {
@@ -43,7 +84,7 @@ export default function DriverDashboard() {
       {/* Online Toggle */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
         <button
-          onClick={() => setIsOnline(!isOnline)}
+          onClick={toggleOnline}
           className={`w-24 h-24 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 mb-4 ${
             isOnline ? 'bg-green-500 shadow-green-500/30' : 'bg-gray-200 shadow-gray-200/50'
           }`}
@@ -62,33 +103,25 @@ export default function DriverDashboard() {
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center">
           <Activity className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-          <p className="text-2xl font-black text-tico-black">12</p>
+          <p className="text-2xl font-black text-tico-black">{stats?.tripsToday ?? 0}</p>
           <p className="text-xs font-bold text-gray-400 uppercase">Viajes Hoy</p>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center">
           <DollarSign className="w-6 h-6 text-green-500 mx-auto mb-2" />
-          <p className="text-2xl font-black text-tico-black">145</p>
+          <p className="text-2xl font-black text-tico-black">{stats?.earnings ?? 0}</p>
           <p className="text-xs font-bold text-gray-400 uppercase">Ganancias</p>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center">
           <Star className="w-6 h-6 text-tico-yellow mx-auto mb-2" />
-          <p className="text-2xl font-black text-tico-black">4.9</p>
+          <p className="text-2xl font-black text-tico-black">{auth.user?.rating?.toFixed(1) || '0.0'}</p>
           <p className="text-xs font-bold text-gray-400 uppercase">Rating</p>
         </div>
       </div>
 
-      {/* Simulate Request Button */}
-      <button 
-        onClick={handleSimulateRequest}
-        className="w-full bg-tico-black text-white font-bold text-lg py-4 rounded-2xl active:scale-[0.98] transition-transform shadow-lg"
-      >
-        Simular Solicitud
-      </button>
-
-      {showRequest && (
+      {showRequest && pendingTrip && (
         <DriverRequest 
           onAccept={handleAcceptRequest} 
-          onReject={() => setShowRequest(false)} 
+          onReject={() => { setShowRequest(false); setPendingTrip(null); }} 
         />
       )}
     </div>

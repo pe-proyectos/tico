@@ -3,8 +3,8 @@ import { MapContainer as LeafletMap, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 export default function MapContainer() {
-  // Coordinates for Lima, Peru
-  const center: [number, number] = [-12.0464, -77.0428];
+  // Coordinates for Chiclayo, Peru
+  const center: [number, number] = [-6.7714, -79.8409];
 
   return (
     <div className="absolute inset-0 z-0 bg-[#e5e3df] overflow-hidden">

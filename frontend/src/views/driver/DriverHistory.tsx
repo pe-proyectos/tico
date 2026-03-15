@@ -1,15 +1,44 @@
-import { useState } from 'react';
-import { Calendar, DollarSign, MapPin } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Calendar, DollarSign } from 'lucide-react';
+import { api } from '../../lib/api';
+
+interface TripRecord {
+  id: string;
+  createdAt: string;
+  estimatedPrice: number;
+  finalPrice: number | null;
+  originAddress: string;
+  destAddress: string;
+  status: string;
+}
 
 export default function DriverHistory() {
   const [filter, setFilter] = useState('hoy');
+  const [trips, setTrips] = useState<TripRecord[]>([]);
+  const [earnings, setEarnings] = useState(0);
 
-  const trips = [
-    { id: 1, time: '14:30', price: 'S/ 15.00', origin: 'Real Plaza', dest: 'USAT', status: 'Completado' },
-    { id: 2, time: '12:15', price: 'S/ 8.00', origin: 'Terminal', dest: 'Centro', status: 'Completado' },
-    { id: 3, time: '10:50', price: 'S/ 12.00', origin: 'Hospital', dest: 'Open Plaza', status: 'Completado' },
-    { id: 4, time: '09:20', price: 'S/ 25.00', origin: 'Aeropuerto', dest: 'Pimentel', status: 'Completado' },
-  ];
+  useEffect(() => {
+    api.get<{ ok: boolean; trips: TripRecord[]; earnings: number }>('/driver/history')
+      .then(res => {
+        setTrips(res.trips || []);
+        setEarnings(res.earnings || 0);
+      })
+      .catch(() => {});
+  }, []);
+
+  const formatTime = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return d.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const statusMap: Record<string, string> = {
+    COMPLETED: 'Completado',
+    CANCELLED: 'Cancelado',
+    SEARCHING: 'Buscando',
+    ACCEPTED: 'Aceptado',
+    IN_PROGRESS: 'En curso',
+    DRIVER_ARRIVING: 'En camino',
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -36,7 +65,7 @@ export default function DriverHistory() {
       <div className="bg-tico-yellow rounded-3xl p-6 shadow-sm flex items-center justify-between">
         <div>
           <p className="text-tico-black/70 font-bold uppercase text-xs mb-1">Ganancias ({filter})</p>
-          <h2 className="text-4xl font-black text-tico-black">S/ 60.00</h2>
+          <h2 className="text-4xl font-black text-tico-black">S/ {earnings.toFixed(2)}</h2>
         </div>
         <div className="w-16 h-16 rounded-full bg-white/30 flex items-center justify-center">
           <DollarSign className="w-8 h-8 text-tico-black" />
@@ -45,28 +74,40 @@ export default function DriverHistory() {
 
       {/* Trip List */}
       <div className="space-y-4">
-        {trips.map((trip) => (
-          <div key={trip.id} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-400" />
-                <span className="text-sm font-bold text-gray-500">{trip.time}</span>
+        {trips.length === 0 ? (
+          <div className="text-center py-12 text-gray-400 font-medium">No hay viajes registrados</div>
+        ) : (
+          trips.map((trip) => (
+            <div key={trip.id} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm font-bold text-gray-500">{formatTime(trip.createdAt)}</span>
+                </div>
+                <span className="font-black text-tico-black text-lg">S/ {(trip.finalPrice || trip.estimatedPrice).toFixed(2)}</span>
               </div>
-              <span className="font-black text-tico-black text-lg">{trip.price}</span>
+              
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0"></div>
+                  <p className="text-sm font-medium text-tico-black truncate">{trip.originAddress}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-tico-yellow shrink-0"></div>
+                  <p className="text-sm font-medium text-tico-black truncate">{trip.destAddress}</p>
+                </div>
+              </div>
+
+              <div className="mt-3 pt-3 border-t border-gray-100">
+                <span className={`text-xs font-bold px-2 py-1 rounded-md ${
+                  trip.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {statusMap[trip.status] || trip.status}
+                </span>
+              </div>
             </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0"></div>
-                <p className="text-sm font-medium text-tico-black truncate">{trip.origin}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-tico-yellow shrink-0"></div>
-                <p className="text-sm font-medium text-tico-black truncate">{trip.dest}</p>
-              </div>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

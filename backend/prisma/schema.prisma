@@ -39,6 +39,8 @@ model User {
   id          String   @id @default(cuid())
   phone       String   @unique
   name        String?
+  email       String?
+  avatar      String?
   role        Role     @default(PASSENGER)
   rating      Float    @default(0)
   ratingCount Int      @default(0)

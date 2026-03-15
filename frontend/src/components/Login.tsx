@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
+import { api } from '../lib/api';
 
 interface LoginProps {
   onLogin: (role: 'passenger' | 'driver' | 'admin') => void;
@@ -10,18 +11,33 @@ export default function Login({ onLogin }: LoginProps) {
   const [step, setStep] = useState<'phone' | 'code'>('phone');
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    setError('');
     if (step === 'phone' && phone.length >= 9) {
-      setStep('code');
+      setLoading(true);
+      try {
+        await api.post('/auth/request-otp', { phone: '+51' + phone });
+        setStep('code');
+      } catch (err: any) {
+        setError(err.message || 'Error al enviar código');
+      } finally {
+        setLoading(false);
+      }
     } else if (step === 'code' && code.length >= 4) {
-      let role: 'passenger' | 'driver' | 'admin' = 'passenger';
-      if (code === '1111') role = 'driver';
-      if (code === '0000') role = 'admin';
-      
-      // Save auth state
-      localStorage.setItem('tico_auth', JSON.stringify({ role, phone }));
-      onLogin(role);
+      setLoading(true);
+      try {
+        const res = await api.post<{ token: string; user: { role: string; name?: string; id: string } }>('/auth/verify-otp', { phone: '+51' + phone, code });
+        const role = res.user.role.toLowerCase() as 'passenger' | 'driver' | 'admin';
+        localStorage.setItem('tico_auth', JSON.stringify({ role, phone, token: res.token, user: res.user }));
+        onLogin(role);
+      } catch (err: any) {
+        setError(err.message || 'Código inválido');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -55,13 +71,15 @@ export default function Login({ onLogin }: LoginProps) {
               />
             </div>
 
+            {error && <p className="text-red-600 font-medium mt-3">{error}</p>}
+
             <div className="mt-auto">
               <button
                 onClick={handleNext}
-                disabled={phone.length < 9}
+                disabled={phone.length < 9 || loading}
                 className="w-full bg-tico-black text-white font-bold text-lg py-4 rounded-2xl shadow-lg disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-2"
               >
-                Continuar <ArrowRight className="w-5 h-5" />
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Continuar <ArrowRight className="w-5 h-5" /></>}
               </button>
             </div>
           </motion.div>
@@ -74,7 +92,7 @@ export default function Login({ onLogin }: LoginProps) {
             className="flex-1 flex flex-col"
           >
             <button 
-              onClick={() => setStep('phone')}
+              onClick={() => { setStep('phone'); setError(''); }}
               className="w-10 h-10 rounded-full bg-tico-black/5 flex items-center justify-center mb-6 -ml-2"
             >
               <ArrowLeft className="w-6 h-6 text-tico-black" />
@@ -99,7 +117,6 @@ export default function Login({ onLogin }: LoginProps) {
                     newCode[index] = e.target.value.replace(/\D/g, '');
                     setCode(newCode.join('').slice(0, 4));
                     
-                    // Auto-focus next input
                     if (e.target.value && index < 3) {
                       const nextInput = document.getElementById(`code-${index + 1}`);
                       nextInput?.focus();
@@ -111,13 +128,15 @@ export default function Login({ onLogin }: LoginProps) {
               ))}
             </div>
 
+            {error && <p className="text-red-600 font-medium text-center mb-4">{error}</p>}
+
             <div className="mt-auto">
               <button
                 onClick={handleNext}
-                disabled={code.length < 4}
+                disabled={code.length < 4 || loading}
                 className="w-full bg-tico-black text-white font-bold text-lg py-4 rounded-2xl shadow-lg disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-2"
               >
-                Verificar y Entrar <ArrowRight className="w-5 h-5" />
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Verificar y Entrar <ArrowRight className="w-5 h-5" /></>}
               </button>
             </div>
           </motion.div>

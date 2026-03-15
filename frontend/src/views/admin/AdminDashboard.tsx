@@ -1,25 +1,33 @@
+import { useState, useEffect } from 'react';
 import { Users, Car, MapPin, DollarSign, Activity } from 'lucide-react';
+import { api } from '../../lib/api';
+
+interface DashboardData {
+  totalUsers: number;
+  totalDrivers: number;
+  totalTrips: number;
+  completedTrips: number;
+  activeTrips: number;
+}
 
 export default function AdminDashboard() {
-  const stats = [
-    { label: 'Viajes Activos', value: '24', icon: MapPin, color: 'bg-blue-100 text-blue-600' },
-    { label: 'Conductores Online', value: '156', icon: Car, color: 'bg-green-100 text-green-600' },
-    { label: 'Viajes Hoy', value: '1,245', icon: Activity, color: 'bg-purple-100 text-purple-600' },
-    { label: 'Ingresos Hoy', value: 'S/ 4,520', icon: DollarSign, color: 'bg-yellow-100 text-yellow-700' },
-  ];
+  const [data, setData] = useState<DashboardData | null>(null);
 
-  const recentActivity = [
-    { id: 1, type: 'trip', msg: 'Viaje completado: Real Plaza → USAT', time: 'Hace 2 min' },
-    { id: 2, type: 'driver', msg: 'Nuevo conductor registrado: Carlos M.', time: 'Hace 15 min' },
-    { id: 3, type: 'payment', msg: 'Pago de plan PRO recibido', time: 'Hace 1 hora' },
-    { id: 4, type: 'alert', msg: 'Alta demanda en Terminal Terrestre', time: 'Hace 2 horas' },
+  useEffect(() => {
+    api.get<{ ok: boolean } & DashboardData>('/admin/dashboard').then(setData).catch(() => {});
+  }, []);
+
+  const stats = [
+    { label: 'Viajes Activos', value: String(data?.activeTrips ?? 0), icon: MapPin, color: 'bg-blue-100 text-blue-600' },
+    { label: 'Conductores', value: String(data?.totalDrivers ?? 0), icon: Car, color: 'bg-green-100 text-green-600' },
+    { label: 'Total Viajes', value: String(data?.totalTrips ?? 0), icon: Activity, color: 'bg-purple-100 text-purple-600' },
+    { label: 'Usuarios', value: String(data?.totalUsers ?? 0), icon: Users, color: 'bg-yellow-100 text-yellow-700' },
   ];
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-tico-black">Dashboard General</h2>
       
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, i) => {
           const Icon = stat.icon;
@@ -37,19 +45,17 @@ export default function AdminDashboard() {
         })}
       </div>
 
-      {/* Recent Activity */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h3 className="text-lg font-bold text-tico-black mb-4">Actividad Reciente</h3>
+        <h3 className="text-lg font-bold text-tico-black mb-4">Resumen</h3>
         <div className="space-y-4">
-          {recentActivity.map((act) => (
-            <div key={act.id} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-tico-yellow"></div>
-                <p className="font-medium text-tico-black">{act.msg}</p>
-              </div>
-              <span className="text-sm text-gray-500">{act.time}</span>
-            </div>
-          ))}
+          <div className="flex items-center justify-between py-3 border-b border-gray-50">
+            <p className="font-medium text-tico-black">Viajes completados</p>
+            <span className="text-lg font-bold text-green-600">{data?.completedTrips ?? 0}</span>
+          </div>
+          <div className="flex items-center justify-between py-3 border-b border-gray-50">
+            <p className="font-medium text-tico-black">Viajes activos</p>
+            <span className="text-lg font-bold text-blue-600">{data?.activeTrips ?? 0}</span>
+          </div>
         </div>
       </div>
     </div>

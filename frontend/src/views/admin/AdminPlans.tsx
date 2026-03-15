@@ -3,8 +3,8 @@ import { Users, DollarSign } from 'lucide-react';
 export default function AdminPlans() {
   const plans = [
     { name: 'FREE', price: 'S/ 0', drivers: 850, revenue: 'S/ 0', color: 'bg-gray-100 text-gray-800' },
-    { name: 'PRO', price: 'S/ 49/mes', drivers: 320, revenue: 'S/ 15,680', color: 'bg-blue-100 text-blue-800' },
-    { name: 'BUSINESS', price: 'S/ 99/mes', drivers: 145, revenue: 'S/ 14,355', color: 'bg-tico-yellow text-tico-black' },
+    { name: 'PRO', price: 'S/ 350/mes', drivers: 320, revenue: 'S/ 112,000', color: 'bg-blue-100 text-blue-800' },
+    { name: 'BUSINESS', price: 'S/ 500/mes', drivers: 145, revenue: 'S/ 72,500', color: 'bg-tico-yellow text-tico-black' },
   ];
 
   return (

@@ -4,6 +4,7 @@ import { authRoutes } from "./routes/auth";
 import { tripRoutes } from "./routes/trips";
 import { driverRoutes } from "./routes/driver";
 import { adminRoutes } from "./routes/admin";
+import { userRoutes } from "./routes/users";
 
 const port = Number(process.env.PORT) || 3000;
 
@@ -15,6 +16,7 @@ const app = new Elysia()
   .use(tripRoutes)
   .use(driverRoutes)
   .use(adminRoutes)
+  .use(userRoutes)
   .listen(port);
 
 console.log(`🚕 Tico API running on port ${port}`);

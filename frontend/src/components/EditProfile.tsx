@@ -1,7 +1,34 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, Camera } from 'lucide-react';
+import { ArrowLeft, Camera, Loader2 } from 'lucide-react';
+import { api } from '../lib/api';
 
 export default function EditProfile({ onBack }: { onBack: () => void }) {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    api.get<any>('/users/me').then(user => {
+      setName(user.name || '');
+      setPhone(user.phone || '');
+      setEmail(user.email || '');
+    }).catch(() => {});
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.patch('/users/me', { name, email });
+      onBack();
+    } catch (err: any) {
+      alert(err.message || 'Error al guardar');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <motion.div 
       initial={{ x: "100%" }}
@@ -18,42 +45,29 @@ export default function EditProfile({ onBack }: { onBack: () => void }) {
       </div>
 
       <div className="p-6">
-        <div className="flex justify-center mb-8">
-          <div className="relative">
-            <img 
-              src="https://picsum.photos/seed/user-profile/200/200" 
-              alt="Profile" 
-              className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-md"
-              referrerPolicy="no-referrer"
-            />
-            <button className="absolute bottom-0 right-0 w-10 h-10 bg-tico-yellow rounded-full border-4 border-white flex items-center justify-center shadow-sm active:scale-95 transition-transform">
-              <Camera className="w-5 h-5 text-tico-black" />
-            </button>
-          </div>
-        </div>
-
         <div className="space-y-4">
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
             <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Nombre completo</label>
-            <input type="text" defaultValue="Juan Pérez" className="w-full font-semibold text-tico-black outline-none bg-transparent" />
+            <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full font-semibold text-tico-black outline-none bg-transparent" />
           </div>
 
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
             <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Número de celular</label>
-            <input type="tel" defaultValue="+51 987 654 321" className="w-full font-semibold text-tico-black outline-none bg-transparent" />
+            <input type="tel" value={phone} disabled className="w-full font-semibold text-gray-400 outline-none bg-transparent" />
           </div>
 
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
             <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Correo electrónico</label>
-            <input type="email" defaultValue="juan.perez@email.com" className="w-full font-semibold text-tico-black outline-none bg-transparent" />
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="tu@email.com" className="w-full font-semibold text-tico-black outline-none bg-transparent placeholder:text-gray-300" />
           </div>
         </div>
 
         <button 
-          onClick={onBack}
-          className="w-full bg-tico-black text-white font-bold text-lg py-4 rounded-2xl shadow-lg active:scale-[0.98] transition-transform mt-8"
+          onClick={handleSave}
+          disabled={saving}
+          className="w-full bg-tico-black text-white font-bold text-lg py-4 rounded-2xl shadow-lg active:scale-[0.98] transition-transform mt-8 disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          Guardar cambios
+          {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Guardar cambios'}
         </button>
       </div>
     </motion.div>

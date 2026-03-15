@@ -6,16 +6,16 @@ export default function DriverPlans() {
       name: 'FREE',
       price: 'S/ 0',
       period: 'por siempre',
-      features: ['10 viajes diarios', 'Soporte estándar', 'Comisión 15%'],
+      features: ['20 viajes/día', 'Sin comisión', 'Soporte estándar'],
       color: 'bg-gray-100',
       textColor: 'text-gray-800',
       buttonColor: 'bg-gray-200 text-gray-600',
     },
     {
       name: 'PRO',
-      price: 'S/ 49',
+      price: 'S/ 350',
       period: '/mes',
-      features: ['Viajes ilimitados', 'Soporte prioritario', 'Comisión 5%', 'Insignia PRO'],
+      features: ['100 viajes/día', 'Sin comisión', 'Soporte prioritario', 'Insignia PRO'],
       color: 'bg-tico-black',
       textColor: 'text-white',
       buttonColor: 'bg-tico-yellow text-tico-black',
@@ -23,9 +23,9 @@ export default function DriverPlans() {
     },
     {
       name: 'BUSINESS',
-      price: 'S/ 99',
+      price: 'S/ 500',
       period: '/mes',
-      features: ['Viajes ilimitados', 'Soporte 24/7', '0% Comisión', 'Viajes corporativos'],
+      features: ['Viajes ilimitados', 'Sin comisión', 'Soporte 24/7', 'Viajes corporativos'],
       color: 'bg-blue-600',
       textColor: 'text-white',
       buttonColor: 'bg-white text-blue-600',
@@ -35,7 +35,7 @@ export default function DriverPlans() {
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-black text-tico-black">Planes de Conductor</h1>
-      <p className="text-gray-500 font-medium">Elige el plan que mejor se adapte a tus necesidades y maximiza tus ganancias.</p>
+      <p className="text-gray-500 font-medium">Elige el plan que mejor se adapte a tus necesidades. Tú te quedas con el 100% de cada viaje.</p>
 
       <div className="space-y-6">
         {plans.map((plan) => (

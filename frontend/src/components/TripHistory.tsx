@@ -1,12 +1,35 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
+import { api } from '../lib/api';
+
+interface TripRecord {
+  id: string;
+  createdAt: string;
+  estimatedPrice: number;
+  finalPrice: number | null;
+  originAddress: string;
+  destAddress: string;
+  status: string;
+}
 
 export default function TripHistory({ onBack }: { onBack: () => void }) {
-  const trips = [
-    { id: 1, date: 'Hoy, 14:30', price: 'S/ 15.00', origin: 'Av. Larco 123', dest: 'Jockey Plaza', status: 'Completado' },
-    { id: 2, date: 'Ayer, 09:15', price: 'S/ 12.00', origin: 'Parque Kennedy', dest: 'Real Plaza Salaverry', status: 'Completado' },
-    { id: 3, date: '12 Mar, 18:45', price: 'S/ 25.00', origin: 'Aeropuerto Jorge Chávez', dest: 'Miraflores', status: 'Cancelado' },
-  ];
+  const [trips, setTrips] = useState<TripRecord[]>([]);
+
+  useEffect(() => {
+    api.get<{ ok: boolean; trips: TripRecord[] }>('/users/me/trips')
+      .then(res => setTrips(res.trips || []))
+      .catch(() => {});
+  }, []);
+
+  const formatDate = (d: string) => {
+    const date = new Date(d);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    if (diff < 86400000) return `Hoy, ${date.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}`;
+    if (diff < 172800000) return `Ayer, ${date.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}`;
+    return date.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  };
 
   return (
     <motion.div 
@@ -24,11 +47,13 @@ export default function TripHistory({ onBack }: { onBack: () => void }) {
       </div>
 
       <div className="p-6 space-y-4">
-        {trips.map(trip => (
+        {trips.length === 0 ? (
+          <div className="text-center py-12 text-gray-400 font-medium">No hay viajes registrados</div>
+        ) : trips.map(trip => (
           <div key={trip.id} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-sm font-bold text-gray-500">{trip.date}</span>
-              <span className="font-bold text-tico-black text-lg">{trip.price}</span>
+              <span className="text-sm font-bold text-gray-500">{formatDate(trip.createdAt)}</span>
+              <span className="font-bold text-tico-black text-lg">S/ {(trip.finalPrice || trip.estimatedPrice).toFixed(2)}</span>
             </div>
             
             <div className="space-y-3 relative">
@@ -38,20 +63,20 @@ export default function TripHistory({ onBack }: { onBack: () => void }) {
                 <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
                   <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                 </div>
-                <p className="text-sm font-medium text-tico-black">{trip.origin}</p>
+                <p className="text-sm font-medium text-tico-black">{trip.originAddress}</p>
               </div>
 
               <div className="flex items-center gap-3 relative z-10">
                 <div className="w-5 h-5 rounded-full bg-tico-yellow/20 flex items-center justify-center shrink-0">
                   <div className="w-2 h-2 rounded-full bg-yellow-600"></div>
                 </div>
-                <p className="text-sm font-medium text-tico-black">{trip.dest}</p>
+                <p className="text-sm font-medium text-tico-black">{trip.destAddress}</p>
               </div>
             </div>
 
             <div className="mt-4 pt-4 border-t border-gray-100">
-              <span className={`text-xs font-bold px-2 py-1 rounded-md ${trip.status === 'Completado' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {trip.status}
+              <span className={`text-xs font-bold px-2 py-1 rounded-md ${trip.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                {trip.status === 'COMPLETED' ? 'Completado' : trip.status === 'CANCELLED' ? 'Cancelado' : trip.status}
               </span>
             </div>
           </div>

@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, User, Star, Clock, Settings, LogOut, ChevronRight, MapPin } from 'lucide-react';
+import { api } from '../lib/api';
 
 interface ProfileProps {
   onBack: () => void;
@@ -9,7 +11,29 @@ interface ProfileProps {
   onSettingsClick: () => void;
 }
 
+interface UserProfile {
+  id: string;
+  name: string;
+  phone: string;
+  rating: number;
+  ratingCount: number;
+  _count?: { tripsAsPassenger: number };
+  tripCount?: number;
+}
+
 export default function Profile({ onBack, onLogout, onEditProfile, onHistoryClick, onSettingsClick }: ProfileProps) {
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const auth = JSON.parse(localStorage.getItem('tico_auth') || '{}');
+
+  useEffect(() => {
+    api.get<UserProfile>('/users/me').then(setProfile).catch(() => {});
+  }, []);
+
+  const name = profile?.name || auth.user?.name || 'Usuario';
+  const phone = profile?.phone || auth.phone || '';
+  const rating = profile?.rating || auth.user?.rating || 0;
+  const tripCount = profile?.tripCount || profile?._count?.tripsAsPassenger || 0;
+
   return (
     <motion.div 
       initial={{ x: "100%" }}
@@ -28,37 +52,32 @@ export default function Profile({ onBack, onLogout, onEditProfile, onHistoryClic
         
         <div className="flex flex-col items-center mt-8">
           <div className="w-24 h-24 rounded-full bg-white p-1 shadow-md mb-4 relative">
-            <img 
-              src="https://picsum.photos/seed/user-profile/200/200" 
-              alt="Profile" 
-              className="w-full h-full rounded-full object-cover"
-              referrerPolicy="no-referrer"
-            />
+            <div className="w-full h-full rounded-full bg-tico-black/10 flex items-center justify-center">
+              <User className="w-10 h-10 text-tico-black/50" />
+            </div>
             <div className="absolute bottom-0 right-0 w-8 h-8 bg-tico-black rounded-full border-2 border-white flex items-center justify-center">
               <Star className="w-4 h-4 text-tico-yellow fill-tico-yellow" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-tico-black">Juan Pérez</h2>
-          <p className="text-tico-black/70 font-medium">+51 987 654 321</p>
+          <h2 className="text-2xl font-bold text-tico-black">{name}</h2>
+          <p className="text-tico-black/70 font-medium">{phone}</p>
         </div>
       </div>
 
       <div className="px-6 py-8 space-y-6">
-        {/* Stats */}
         <div className="flex gap-4">
           <div className="flex-1 bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex flex-col items-center">
             <Star className="w-6 h-6 text-tico-yellow fill-tico-yellow mb-2" />
-            <span className="text-2xl font-bold text-tico-black">4.9</span>
+            <span className="text-2xl font-bold text-tico-black">{rating.toFixed(1)}</span>
             <span className="text-xs text-gray-500 font-medium">Calificación</span>
           </div>
           <div className="flex-1 bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex flex-col items-center">
             <MapPin className="w-6 h-6 text-blue-500 mb-2" />
-            <span className="text-2xl font-bold text-tico-black">128</span>
+            <span className="text-2xl font-bold text-tico-black">{tripCount}</span>
             <span className="text-xs text-gray-500 font-medium">Viajes</span>
           </div>
         </div>
 
-        {/* Menu Items */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <MenuItem icon={User} title="Editar Perfil" onClick={onEditProfile} />
           <MenuItem icon={Clock} title="Mis Viajes" onClick={onHistoryClick} />
