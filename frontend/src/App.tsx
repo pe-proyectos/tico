@@ -1,68 +1,110 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { useAuth } from './context/AuthContext'
-import LoadingSpinner from './components/LoadingSpinner'
-import Login from './pages/Login'
-import Home from './pages/passenger/Home'
-import Waiting from './pages/passenger/Waiting'
-import ActiveTrip from './pages/passenger/ActiveTrip'
-import Complete from './pages/passenger/Complete'
-import DriverDashboard from './pages/driver/Dashboard'
-import DriverRequest from './pages/driver/Request'
-import DriverTrip from './pages/driver/Trip'
-import DriverHistory from './pages/driver/History'
-import DriverPlan from './pages/driver/Plan'
-import AdminDashboard from './pages/admin/Dashboard'
-import AdminDrivers from './pages/admin/Drivers'
-import AdminTrips from './pages/admin/Trips'
-import AdminPlans from './pages/admin/Plans'
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import Login from './components/Login';
+import PassengerApp from './views/passenger/PassengerApp';
+import DriverLayout from './views/driver/DriverLayout';
+import DriverDashboard from './views/driver/DriverDashboard';
+import DriverTrip from './views/driver/DriverTrip';
+import DriverHistory from './views/driver/DriverHistory';
+import DriverPlans from './views/driver/DriverPlans';
+import AdminLayout from './views/admin/AdminLayout';
+import AdminDashboard from './views/admin/AdminDashboard';
+import AdminDrivers from './views/admin/AdminDrivers';
+import AdminTrips from './views/admin/AdminTrips';
+import AdminPlans from './views/admin/AdminPlans';
+import DevNav from './components/DevNav';
 
-export default function App() {
-  const { user, loading } = useAuth()
-  const location = useLocation()
+function AuthGuard({ children, allowedRole }: { children: React.ReactNode, allowedRole: string }) {
+  const authStr = localStorage.getItem('tico_auth');
+  if (!authStr) return <Navigate to="/login" replace />;
+  
+  try {
+    const auth = JSON.parse(authStr);
+    if (auth.role !== allowedRole) {
+      if (auth.role === 'admin') return <Navigate to="/admin" replace />;
+      if (auth.role === 'driver') return <Navigate to="/driver" replace />;
+      return <Navigate to="/" replace />;
+    }
+  } catch (e) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return <>{children}</>;
+}
 
-  if (loading) return (
-    <div className="app-shell">
-      <div style={{ height: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <LoadingSpinner size={48} />
-      </div>
-    </div>
-  )
-
-  if (!user) return (
-    <div className="app-shell">
-      <Login />
-    </div>
-  )
+function LoginWrapper() {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    const authStr = localStorage.getItem('tico_auth');
+    if (authStr) {
+      try {
+        const auth = JSON.parse(authStr);
+        if (auth.role === 'admin') navigate('/admin');
+        else if (auth.role === 'driver') navigate('/driver');
+        else navigate('/');
+      } catch (e) {}
+    }
+  }, [navigate]);
 
   return (
-    <div className="app-shell">
-      <div key={location.pathname} className="page-fade">
-        <Routes location={location}>
-          {/* Passenger */}
-          <Route path="/" element={<Home />} />
-          <Route path="/trip/:id/waiting" element={<Waiting />} />
-          <Route path="/trip/:id/active" element={<ActiveTrip />} />
-          <Route path="/trip/:id/complete" element={<Complete />} />
+    <Login onLogin={(role) => {
+      if (role === 'admin') navigate('/admin');
+      else if (role === 'driver') navigate('/driver');
+      else navigate('/');
+    }} />
+  );
+}
 
-          {/* Driver */}
-          <Route path="/driver" element={<DriverDashboard />} />
-          <Route path="/driver/request" element={<DriverRequest />} />
-          <Route path="/driver/trip/:id" element={<DriverTrip />} />
-          <Route path="/driver/history" element={<DriverHistory />} />
-          <Route path="/driver/plan" element={<DriverPlan />} />
+export default function App() {
+  return (
+    <BrowserRouter>
+      <DevNav />
+      <Routes>
+        <Route path="/login" element={<LoginWrapper />} />
+        
+        {/* Passenger Routes */}
+        <Route 
+          path="/" 
+          element={
+            <AuthGuard allowedRole="passenger">
+              <PassengerApp />
+            </AuthGuard>
+          } 
+        />
 
-          {/* Admin */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/drivers" element={<AdminDrivers />} />
-          <Route path="/admin/trips" element={<AdminTrips />} />
-          <Route path="/admin/plans" element={<AdminPlans />} />
+        {/* Driver Routes */}
+        <Route 
+          path="/driver" 
+          element={
+            <AuthGuard allowedRole="driver">
+              <DriverLayout />
+            </AuthGuard>
+          }
+        >
+          <Route index element={<DriverDashboard />} />
+          <Route path="trip" element={<DriverTrip />} />
+          <Route path="history" element={<DriverHistory />} />
+          <Route path="plans" element={<DriverPlans />} />
+        </Route>
 
-          {/* Fallback */}
-          <Route path="*" element={
-            <Navigate to={user.role === 'ADMIN' ? '/admin' : user.role === 'DRIVER' ? '/driver' : '/'} />
-          } />
-        </Routes>
-      </div>
-    </div>
-  )
+        {/* Admin Routes */}
+        <Route 
+          path="/admin" 
+          element={
+            <AuthGuard allowedRole="admin">
+              <AdminLayout />
+            </AuthGuard>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="drivers" element={<AdminDrivers />} />
+          <Route path="trips" element={<AdminTrips />} />
+          <Route path="plans" element={<AdminPlans />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }

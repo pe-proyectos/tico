@@ -1,0 +1,5 @@
+{
+  "name": "Tico App MVP",
+  "description": "Frontend MVP for Tico, a mobility app in Peru.",
+  "requestFramePermissions": ["geolocation"]
+}
