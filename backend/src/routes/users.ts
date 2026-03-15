@@ -38,6 +38,27 @@ export const userRoutes = new Elysia({ prefix: "/api/users" })
     })
   })
 
+  .delete("/me", async ({ user, set }) => {
+    if (!requireAuth(set, user)) return { error: "Unauthorized" };
+    // Cancel active trips
+    await prisma.trip.updateMany({
+      where: {
+        OR: [{ passengerId: user.id }, { driverId: user.id }],
+        status: { notIn: ["COMPLETED", "CANCELLED"] },
+      },
+      data: { status: "CANCELLED" },
+    });
+    // Delete ratings
+    await prisma.rating.deleteMany({ where: { OR: [{ fromUserId: user.id }, { toUserId: user.id }] } });
+    // Delete driver if exists
+    if (user.driver) {
+      await prisma.driver.delete({ where: { id: user.driver.id } });
+    }
+    // Delete user
+    await prisma.user.delete({ where: { id: user.id } });
+    return { ok: true, message: "Account deleted" };
+  })
+
   .get("/me/trips", async ({ user, set }) => {
     if (!requireAuth(set, user)) return { error: "Unauthorized" };
     const trips = await prisma.trip.findMany({

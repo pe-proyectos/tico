@@ -2,6 +2,8 @@ import { Elysia, t } from "elysia";
 import { prisma } from "../lib/prisma";
 import { getUserFromToken, type AuthUser } from "../middleware/auth";
 import { PLAN_LIMITS } from "../lib/pricing";
+import { broadcastTripUpdate, subscribeToTrip } from "../lib/realtime";
+import { updateDriverLocation } from "../lib/locations";
 
 function requireDriver(set: any, user: AuthUser | null): user is AuthUser & { driver: NonNullable<AuthUser["driver"]> } {
   if (!user) { set.status = 401; return false; }
@@ -129,6 +131,9 @@ export const driverRoutes = new Elysia({ prefix: "/api" })
       data: { driverId: user.id, status: "ACCEPTED", acceptedAt: new Date() },
       include: { passenger: true, driver: { include: { driver: true } } },
     });
+    subscribeToTrip(params.id, user.id);
+    subscribeToTrip(params.id, trip.passengerId);
+    broadcastTripUpdate(params.id, updated);
     return { ok: true, trip: updated };
   })
 
@@ -139,6 +144,7 @@ export const driverRoutes = new Elysia({ prefix: "/api" })
       set.status = 400; return { error: "Invalid state" };
     }
     const updated = await prisma.trip.update({ where: { id: params.id }, data: { status: "DRIVER_ARRIVING" } });
+    broadcastTripUpdate(params.id, updated);
     return { ok: true, trip: updated };
   })
 
@@ -149,6 +155,7 @@ export const driverRoutes = new Elysia({ prefix: "/api" })
       set.status = 400; return { error: "Invalid state" };
     }
     const updated = await prisma.trip.update({ where: { id: params.id }, data: { status: "IN_PROGRESS", startedAt: new Date() } });
+    broadcastTripUpdate(params.id, updated);
     return { ok: true, trip: updated };
   })
 
@@ -167,5 +174,53 @@ export const driverRoutes = new Elysia({ prefix: "/api" })
       where: { id: user.driver!.id },
       data: { tripsToday: { increment: 1 } },
     });
+    broadcastTripUpdate(params.id, updated);
     return { ok: true, trip: updated };
+  })
+
+  .post("/driver/location", async ({ body, user, set }) => {
+    if (!requireDriver(set, user)) return { error: "Forbidden" };
+    updateDriverLocation(user.id, body.lat, body.lng);
+    return { ok: true };
+  }, {
+    body: t.Object({ lat: t.Number(), lng: t.Number() })
+  })
+
+  .post("/driver/upgrade-plan", async ({ body, user, set }) => {
+    if (!requireDriver(set, user)) return { error: "Forbidden" };
+    if (!["PRO", "BUSINESS"].includes(body.plan)) {
+      set.status = 400; return { error: "Invalid plan. Must be PRO or BUSINESS." };
+    }
+    const updated = await prisma.driver.update({
+      where: { id: user.driver.id },
+      data: { planType: body.plan as any },
+    });
+    return { ok: true, driver: updated };
+  }, {
+    body: t.Object({ plan: t.String() })
+  })
+
+  .patch("/driver/vehicle", async ({ body, user, set }) => {
+    if (!requireDriver(set, user)) return { error: "Forbidden" };
+    const data: any = {};
+    for (const field of ["licensePlate", "vehicleBrand", "vehicleModel", "vehicleColor"] as const) {
+      if (body[field] !== undefined) {
+        if (typeof body[field] !== "string" || body[field].trim() === "") {
+          set.status = 400; return { error: `${field} must be a non-empty string` };
+        }
+        data[field] = body[field];
+      }
+    }
+    if (data.licensePlate && !/^[A-Za-z0-9\-]{6,8}$/.test(data.licensePlate)) {
+      set.status = 400; return { error: "Invalid license plate format" };
+    }
+    const updated = await prisma.driver.update({ where: { id: user.driver.id }, data });
+    return { ok: true, driver: updated };
+  }, {
+    body: t.Object({
+      licensePlate: t.Optional(t.String()),
+      vehicleBrand: t.Optional(t.String()),
+      vehicleModel: t.Optional(t.String()),
+      vehicleColor: t.Optional(t.String()),
+    })
   });

@@ -2,6 +2,8 @@ import { Elysia, t } from "elysia";
 import { prisma } from "../lib/prisma";
 import { getUserFromToken, type AuthUser } from "../middleware/auth";
 import { estimatePrice } from "../lib/pricing";
+import { broadcastTripUpdate, subscribeToTrip } from "../lib/realtime";
+import { getDriverLocation } from "../lib/locations";
 
 function requireAuth(set: any, user: AuthUser | null): user is AuthUser {
   if (!user) { set.status = 401; return false; }
@@ -37,6 +39,7 @@ export const tripRoutes = new Elysia({ prefix: "/api/trips" })
         estimatedPrice: est.price, status: "SEARCHING",
       },
     });
+    subscribeToTrip(trip.id, user.id);
     return { ok: true, trip };
   }, {
     body: t.Object({
@@ -67,7 +70,21 @@ export const tripRoutes = new Elysia({ prefix: "/api/trips" })
       set.status = 400; return { error: "Cannot cancel" };
     }
     const updated = await prisma.trip.update({ where: { id: params.id }, data: { status: "CANCELLED" } });
+    broadcastTripUpdate(params.id, updated);
     return { ok: true, trip: updated };
+  })
+
+  .get("/:id/driver-location", async ({ params, user, set }) => {
+    if (!requireAuth(set, user)) return { error: "Unauthorized" };
+    const trip = await prisma.trip.findUnique({ where: { id: params.id } });
+    if (!trip) { set.status = 404; return { error: "Trip not found" }; }
+    if (trip.passengerId !== user.id && trip.driverId !== user.id && user.role !== "ADMIN") {
+      set.status = 403; return { error: "Forbidden" };
+    }
+    if (!trip.driverId) { set.status = 400; return { error: "No driver assigned" }; }
+    const location = getDriverLocation(trip.driverId);
+    if (!location) return { ok: true, location: null };
+    return { ok: true, location };
   })
 
   .post("/:id/rate", async ({ params, body, user, set }) => {
