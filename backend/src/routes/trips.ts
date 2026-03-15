@@ -52,6 +52,10 @@ export const tripRoutes = new Elysia({ prefix: "/api/trips" })
       include: { passenger: true, driver: { include: { driver: true } } },
     });
     if (!trip) { set.status = 404; return { error: "Trip not found" }; }
+    // Access control: only passenger, driver, or admin
+    if (trip.passengerId !== user.id && trip.driverId !== user.id && user.role !== 'ADMIN') {
+      set.status = 403; return { error: "Forbidden" };
+    }
     return { ok: true, trip };
   })
 

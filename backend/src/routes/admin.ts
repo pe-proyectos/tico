@@ -26,6 +26,10 @@ export const adminRoutes = new Elysia({ prefix: "/api/admin" })
 
   .patch("/drivers/:id", async ({ params, body, user, set }) => {
     if (!requireAdmin(set, user)) return { error: "Forbidden" };
+    const validStatuses = ['PENDING', 'APPROVED', 'REJECTED', 'SUSPENDED'];
+    if (body.status && !validStatuses.includes(body.status)) {
+      set.status = 400; return { error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` };
+    }
     const data: any = {};
     if (body.status) data.status = body.status;
     const updated = await prisma.driver.update({ where: { id: params.id }, data, include: { user: true } });

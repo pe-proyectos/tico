@@ -11,4 +11,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "bunx prisma db push --skip-generate --accept-data-loss 2>&1 || echo 'DB push failed, starting anyway...' && bun run src/index.ts"]
+CMD ["sh", "-c", "bunx prisma db push --skip-generate 2>&1; bun run src/index.ts"]

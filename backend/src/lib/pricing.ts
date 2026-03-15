@@ -1,6 +1,6 @@
-const BASE_FARE = 4; // S/4
-const PER_KM = 1.5; // S/1.5 per km
-const ROAD_FACTOR = 1.3;
+const BASE_FARE = Number(process.env.BASE_FARE) || 4; // S/4
+const PER_KM = Number(process.env.PER_KM) || 1.5; // S/1.5 per km
+const ROAD_FACTOR = Number(process.env.ROAD_FACTOR) || 1.3;
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
@@ -19,7 +19,7 @@ export function estimatePrice(originLat: number, originLng: number, destLat: num
 }
 
 export const PLAN_LIMITS: Record<string, number> = {
-  FREE: 20,
-  PRO: 100,
-  BUSINESS: Infinity,
+  FREE: Number(process.env.PLAN_LIMIT_FREE) || 20,
+  PRO: Number(process.env.PLAN_LIMIT_PRO) || 100,
+  BUSINESS: Number(process.env.PLAN_LIMIT_BUSINESS) || Infinity,
 };

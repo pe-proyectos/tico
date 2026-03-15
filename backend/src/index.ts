@@ -9,7 +9,7 @@ import { userRoutes } from "./routes/users";
 const port = Number(process.env.PORT) || 3000;
 
 const app = new Elysia()
-  .use(cors())
+  .use(cors({ origin: ['https://tico.luminari.agency', 'http://localhost:5173'] }))
   .get("/health", () => ({ ok: true, service: "tico-api", time: new Date().toISOString() }))
   .get("/api/health", () => ({ ok: true, service: "tico-api", time: new Date().toISOString() }))
   .use(authRoutes)

@@ -9,12 +9,14 @@ function requireDriver(set: any, user: AuthUser | null): user is AuthUser & { dr
   return true;
 }
 
-// Reset tripsToday if lastTripReset is before today in Peru time (UTC-5)
+const TZ_OFFSET = Number(process.env.TZ_OFFSET_HOURS) || -5;
+
+// Reset tripsToday if lastTripReset is before today in local time
 async function resetIfNeeded(driverId: string, lastReset: Date, tripsToday: number) {
   const now = new Date();
-  const peruNow = new Date(now.getTime() - 5 * 60 * 60 * 1000);
-  const peruReset = new Date(lastReset.getTime() - 5 * 60 * 60 * 1000);
-  if (peruNow.toDateString() !== peruReset.toDateString()) {
+  const localNow = new Date(now.getTime() + TZ_OFFSET * 60 * 60 * 1000);
+  const localReset = new Date(lastReset.getTime() + TZ_OFFSET * 60 * 60 * 1000);
+  if (localNow.toUTCString().slice(0, 16) !== localReset.toUTCString().slice(0, 16)) {
     await prisma.driver.update({ where: { id: driverId }, data: { tripsToday: 0, lastTripReset: now } });
     return 0;
   }
@@ -30,6 +32,10 @@ export const driverRoutes = new Elysia({ prefix: "/api" })
   .post("/driver/register", async ({ body, user, set }) => {
     if (!user) { set.status = 401; return { error: "Unauthorized" }; }
     if (user.driver) { set.status = 400; return { error: "Already registered as driver" }; }
+    // License plate validation: 6-8 alphanumeric + dash chars
+    if (!/^[A-Za-z0-9\-]{6,8}$/.test(body.licensePlate)) {
+      set.status = 400; return { error: "Invalid license plate format. Must be 6-8 alphanumeric characters." };
+    }
     const driver = await prisma.driver.create({
       data: {
         userId: user.id,
@@ -77,6 +83,7 @@ export const driverRoutes = new Elysia({ prefix: "/api" })
 
   .get("/driver/requests", async ({ user, set }) => {
     if (!requireDriver(set, user)) return { error: "Forbidden" };
+    if (user.driver.status !== "APPROVED") { set.status = 403; return { error: "Driver not approved" }; }
     const trips = await prisma.trip.findMany({
       where: { status: "SEARCHING" },
       orderBy: { createdAt: "desc" },
@@ -89,9 +96,12 @@ export const driverRoutes = new Elysia({ prefix: "/api" })
   .get("/driver/stats", async ({ user, set }) => {
     if (!requireDriver(set, user)) return { error: "Forbidden" };
     const tripsToday = await resetIfNeeded(user.driver.id, user.driver.lastTripReset, user.driver.tripsToday);
-    const todayStart = new Date();
-    todayStart.setUTCHours(todayStart.getUTCHours() - 5); // Peru
-    todayStart.setHours(0, 0, 0, 0);
+    // Compute midnight in local timezone (TZ_OFFSET) as UTC timestamp
+    const now = new Date();
+    const localMs = now.getTime() + TZ_OFFSET * 60 * 60 * 1000;
+    const localMidnight = new Date(localMs);
+    localMidnight.setUTCHours(0, 0, 0, 0);
+    const todayStart = new Date(localMidnight.getTime() - TZ_OFFSET * 60 * 60 * 1000);
     
     const completedToday = await prisma.trip.findMany({
       where: { driverId: user.id, status: "COMPLETED", completedAt: { gte: todayStart } },
@@ -150,6 +160,7 @@ export const driverRoutes = new Elysia({ prefix: "/api" })
     }
     const updated = await prisma.trip.update({
       where: { id: params.id },
+      // TODO: Recalculate finalPrice based on actual route/distance instead of using estimate
       data: { status: "COMPLETED", finalPrice: trip.estimatedPrice, completedAt: new Date() },
     });
     await prisma.driver.update({

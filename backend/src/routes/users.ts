@@ -21,6 +21,11 @@ export const userRoutes = new Elysia({ prefix: "/api/users" })
 
   .patch("/me", async ({ body, user, set }) => {
     if (!requireAuth(set, user)) return { error: "Unauthorized" };
+    if (body.email !== undefined && body.email !== '') {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+        set.status = 400; return { error: "Invalid email format" };
+      }
+    }
     const data: any = {};
     if (body.name !== undefined) data.name = body.name;
     if (body.email !== undefined) data.email = body.email;
