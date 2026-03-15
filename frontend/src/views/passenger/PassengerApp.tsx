@@ -16,6 +16,13 @@ import Settings from '../../components/Settings';
 import DriverMode from '../../components/DriverMode';
 import EditProfile from '../../components/EditProfile';
 import TripComplete from './TripComplete';
+import { fetchOSRMRoute } from '../../lib/osrm';
+
+interface RouteData {
+  origin: [number, number];
+  destination: [number, number];
+  routeCoords: [number, number][];
+}
 
 type ViewState = 'home' | 'profile' | 'payment' | 'history' | 'messages' | 'support' | 'settings' | 'driverMode' | 'editProfile';
 
@@ -27,13 +34,23 @@ export default function PassengerApp() {
   const [currentTripId, setCurrentTripId] = useState<string | null>(null);
   const [currentTrip, setCurrentTrip] = useState<any>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [routeData, setRouteData] = useState<RouteData | null>(null);
   const navigate = useNavigate();
 
-  const handleTripCreated = (trip: any) => {
+  const handleTripCreated = async (trip: any) => {
     setProposedPrice(trip.estimatedPrice || 0);
     setCurrentTripId(trip.id);
     setCurrentTrip(trip);
     setOrderState('negotiating');
+    // Fetch route for trip if we have coords
+    if (trip.originLat && trip.destLat) {
+      try {
+        const origin: [number, number] = [trip.originLat, trip.originLng];
+        const dest: [number, number] = [trip.destLat, trip.destLng];
+        const routeCoords = await fetchOSRMRoute(origin, dest);
+        setRouteData({ origin, destination: dest, routeCoords });
+      } catch {}
+    }
   };
 
   const handleCancel = () => {
@@ -41,6 +58,7 @@ export default function PassengerApp() {
     setSelectedDriver(null);
     setCurrentTripId(null);
     setCurrentTrip(null);
+    setRouteData(null);
   };
 
   const handleDriverAccepted = (trip: any) => {
@@ -64,7 +82,11 @@ export default function PassengerApp() {
         onProfileClick={() => setView('profile')} 
         onMenuClick={() => setIsSidebarOpen(true)} 
       />
-      <MapContainer />
+      <MapContainer 
+        origin={routeData?.origin} 
+        destination={routeData?.destination} 
+        routeCoords={routeData?.routeCoords} 
+      />
       
       <Sidebar 
         isOpen={isSidebarOpen} 
@@ -99,7 +121,7 @@ export default function PassengerApp() {
         {view === 'editProfile' && <EditProfile key="editProfile" onBack={() => setView('profile')} />}
 
         {view === 'home' && orderState === 'idle' && (
-          <OrderPanel key="order-panel" onTripCreated={handleTripCreated} />
+          <OrderPanel key="order-panel" onTripCreated={handleTripCreated} onRouteUpdate={setRouteData} />
         )}
         
         {view === 'home' && orderState === 'negotiating' && currentTripId && (

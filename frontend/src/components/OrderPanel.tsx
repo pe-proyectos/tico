@@ -2,9 +2,17 @@ import { useState } from 'react';
 import { MapPin, Navigation, Car, Truck, Zap, Search, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { api } from '../lib/api';
+import { fetchOSRMRoute } from '../lib/osrm';
+
+interface RouteData {
+  origin: [number, number];
+  destination: [number, number];
+  routeCoords: [number, number][];
+}
 
 interface OrderPanelProps {
   onTripCreated: (trip: any) => void;
+  onRouteUpdate?: (route: RouteData | null) => void;
 }
 
 const categories = [
@@ -21,7 +29,7 @@ const quickDestinations = [
   { name: 'USAT', icon: '🎓', lat: -6.7560, lng: -79.8440 },
 ];
 
-export default function OrderPanel({ onTripCreated }: OrderPanelProps) {
+export default function OrderPanel({ onTripCreated, onRouteUpdate }: OrderPanelProps) {
   const [price, setPrice] = useState<number>(12);
   const [selectedCategory, setSelectedCategory] = useState('basico');
   const [destination, setDestination] = useState('');
@@ -45,7 +53,16 @@ export default function OrderPanel({ onTripCreated }: OrderPanelProps) {
         setSuggestedPrice(res.price);
         setPrice(res.price);
       }
-    } catch {}
+      // Fetch and show route preview
+      const origin: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+      const destination: [number, number] = [dest.lat, dest.lng];
+      try {
+        const routeCoords = await fetchOSRMRoute(origin, destination);
+        onRouteUpdate?.({ origin, destination, routeCoords });
+      } catch {}
+    } catch {
+      onRouteUpdate?.(null);
+    }
   };
 
   const handleRequest = async () => {

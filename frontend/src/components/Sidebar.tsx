@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, CreditCard, Clock, MessageSquare, HelpCircle, Settings, CarFront } from 'lucide-react';
 
@@ -13,6 +14,20 @@ interface SidebarProps {
   onDriverModeClick: () => void;
 }
 
+function getUserName(): string {
+  try {
+    const auth = JSON.parse(localStorage.getItem('tico_auth') || '{}');
+    return auth?.user?.name || 'Usuario';
+  } catch {
+    return 'Usuario';
+  }
+}
+
+function getUserInitial(): string {
+  const name = getUserName();
+  return name.charAt(0).toUpperCase();
+}
+
 export default function Sidebar({ 
   isOpen, 
   onClose, 
@@ -24,6 +39,16 @@ export default function Sidebar({
   onSettingsClick,
   onDriverModeClick
 }: SidebarProps) {
+  const [userName, setUserName] = useState('Usuario');
+  const [userInitial, setUserInitial] = useState('U');
+
+  useEffect(() => {
+    if (isOpen) {
+      setUserName(getUserName());
+      setUserInitial(getUserInitial());
+    }
+  }, [isOpen]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -61,14 +86,11 @@ export default function Sidebar({
                   onProfileClick();
                 }}
               >
-                <img 
-                  src="https://picsum.photos/seed/user-profile/100/100" 
-                  alt="Profile" 
-                  className="w-16 h-16 rounded-full border-2 border-white object-cover shadow-sm"
-                  referrerPolicy="no-referrer"
-                />
+                <div className="w-16 h-16 rounded-full border-2 border-white bg-tico-black flex items-center justify-center shadow-sm">
+                  <span className="text-2xl font-bold text-white">{userInitial}</span>
+                </div>
                 <div>
-                  <h2 className="text-xl font-bold text-tico-black leading-tight">Juan Pérez</h2>
+                  <h2 className="text-xl font-bold text-tico-black leading-tight">{userName}</h2>
                   <p className="text-tico-black/70 font-medium text-sm">Ver perfil</p>
                 </div>
               </div>
@@ -78,7 +100,7 @@ export default function Sidebar({
             <div className="flex-1 overflow-y-auto py-6 px-4 space-y-2">
               <MenuItem icon={CreditCard} title="Métodos de pago" onClick={() => { onClose(); onPaymentClick(); }} />
               <MenuItem icon={Clock} title="Historial de viajes" onClick={() => { onClose(); onHistoryClick(); }} />
-              <MenuItem icon={MessageSquare} title="Mensajes" badge="2" onClick={() => { onClose(); onMessagesClick(); }} />
+              <MenuItem icon={MessageSquare} title="Mensajes" onClick={() => { onClose(); onMessagesClick(); }} />
               <MenuItem icon={HelpCircle} title="Soporte" onClick={() => { onClose(); onSupportClick(); }} />
               <MenuItem icon={Settings} title="Configuración" onClick={() => { onClose(); onSettingsClick(); }} />
               
