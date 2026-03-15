@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, CreditCard, Clock, MessageSquare, HelpCircle, Settings, CarFront } from 'lucide-react';
+import { X, CreditCard, Clock, MessageSquare, HelpCircle, Settings, CarFront, LogOut } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -12,6 +12,7 @@ interface SidebarProps {
   onSupportClick: () => void;
   onSettingsClick: () => void;
   onDriverModeClick: () => void;
+  onLogout: () => void;
 }
 
 function getUserName(): string {
@@ -37,7 +38,8 @@ export default function Sidebar({
   onMessagesClick,
   onSupportClick,
   onSettingsClick,
-  onDriverModeClick
+  onDriverModeClick,
+  onLogout
 }: SidebarProps) {
   const [userName, setUserName] = useState('Usuario');
   const [userInitial, setUserInitial] = useState('U');
@@ -117,6 +119,17 @@ export default function Sidebar({
                   <span className="block font-bold text-tico-black">Modo Conductor</span>
                   <span className="block text-xs text-gray-500 font-medium">Gana dinero manejando</span>
                 </div>
+              </button>
+            </div>
+
+            {/* Logout */}
+            <div className="p-4 border-t border-gray-100">
+              <button 
+                onClick={() => { onClose(); onLogout(); }}
+                className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-red-50 transition-colors active:bg-red-100 text-red-500"
+              >
+                <LogOut className="w-6 h-6" />
+                <span className="font-semibold text-lg">Cerrar Sesión</span>
               </button>
             </div>
           </motion.div>

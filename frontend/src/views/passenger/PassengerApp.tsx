@@ -98,6 +98,7 @@ export default function PassengerApp() {
         onSupportClick={() => setView('support')}
         onSettingsClick={() => setView('settings')}
         onDriverModeClick={() => setView('driverMode')}
+        onLogout={handleLogout}
       />
 
       <AnimatePresence>

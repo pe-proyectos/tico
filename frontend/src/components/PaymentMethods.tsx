@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { ArrowLeft, CreditCard, Plus, Banknote } from 'lucide-react';
+import { ArrowLeft, Banknote, Wallet } from 'lucide-react';
 
 export default function PaymentMethods({ onBack }: { onBack: () => void }) {
   return (
@@ -18,35 +18,24 @@ export default function PaymentMethods({ onBack }: { onBack: () => void }) {
       </div>
 
       <div className="p-6 space-y-4">
-        <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center justify-between">
+        <div className="bg-white rounded-3xl p-4 shadow-sm border-2 border-tico-yellow flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
               <Banknote className="w-6 h-6 text-green-600" />
             </div>
             <div>
               <h3 className="font-bold text-tico-black">Efectivo</h3>
-              <p className="text-sm text-gray-500">Pago al conductor</p>
+              <p className="text-sm text-gray-500">Pago directo al conductor</p>
             </div>
           </div>
           <div className="w-6 h-6 rounded-full border-4 border-tico-yellow bg-white"></div>
         </div>
 
-        <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-              <CreditCard className="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <h3 className="font-bold text-tico-black">•••• 4242</h3>
-              <p className="text-sm text-gray-500">Expira 12/28</p>
-            </div>
-          </div>
-          <div className="w-6 h-6 rounded-full border-2 border-gray-200 bg-white"></div>
+        <div className="bg-gray-50 rounded-3xl p-6 text-center mt-8">
+          <Wallet className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-400 font-medium">Próximamente</p>
+          <p className="text-gray-300 text-sm mt-1">Yape y tarjetas de crédito</p>
         </div>
-
-        <button className="w-full bg-gray-100 text-tico-black font-bold text-lg py-4 rounded-2xl active:scale-[0.98] transition-transform flex items-center justify-center gap-2 mt-6">
-          <Plus className="w-5 h-5" /> Agregar tarjeta
-        </button>
       </div>
     </motion.div>
   );
