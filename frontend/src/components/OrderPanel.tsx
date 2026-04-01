@@ -31,13 +31,11 @@ const categories = [
   { id: 'carga', name: 'Tico Carga', icon: Truck, emoji: '🚛', desc: '', sub: 'Envíos y mudanzas', mult: 1.5 },
 ];
 
-const quickDestinations = [
-  { name: 'Real Plaza', icon: '🛍️', lat: -6.7650, lng: -79.8380 },
-  { name: 'Open Plaza', icon: '🛒', lat: -6.7630, lng: -79.8410 },
-  { name: 'Terminal', icon: '🚌', lat: -6.7800, lng: -79.8430 },
-  { name: 'Hospital', icon: '🏥', lat: -6.7740, lng: -79.8350 },
-  { name: 'USAT', icon: '🎓', lat: -6.7560, lng: -79.8440 },
-];
+interface RecentDest {
+  name: string;
+  lat: number;
+  lng: number;
+}
 
 export default function OrderPanel({ onTripCreated, onRouteUpdate }: OrderPanelProps) {
   // Step: 'destination' or 'configure'
@@ -56,6 +54,31 @@ export default function OrderPanel({ onTripCreated, onRouteUpdate }: OrderPanelP
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const { toast, show: showToast, hide: hideToast } = useToast();
   const originRef = useRef<{ lat: number; lng: number } | null>(null);
+  const [recentDests, setRecentDests] = useState<RecentDest[]>([]);
+
+  // Fetch recent destinations from trip history
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.get<{ ok: boolean; trips: any[] }>('/trips');
+        if (res.trips && res.trips.length > 0) {
+          const seen = new Set<string>();
+          const recents: RecentDest[] = [];
+          for (const t of res.trips) {
+            if (t.destAddress && t.destLat && t.destLng) {
+              const key = t.destAddress;
+              if (!seen.has(key)) {
+                seen.add(key);
+                recents.push({ name: t.destAddress, lat: t.destLat, lng: t.destLng });
+              }
+              if (recents.length >= 5) break;
+            }
+          }
+          setRecentDests(recents);
+        }
+      } catch {}
+    })();
+  }, []);
 
   // Drag
   const dragY = useMotionValue(0);
@@ -121,7 +144,7 @@ export default function OrderPanel({ onTripCreated, onRouteUpdate }: OrderPanelP
     await fetchEstimate({ lat, lng });
   };
 
-  const handleSelectDest = async (dest: typeof quickDestinations[0]) => {
+  const handleSelectDest = async (dest: RecentDest) => {
     setDestination(dest.name);
     setDestCoords({ lat: dest.lat, lng: dest.lng });
     setShowResults(false);
@@ -189,10 +212,10 @@ export default function OrderPanel({ onTripCreated, onRouteUpdate }: OrderPanelP
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         drag="y"
-        dragConstraints={{ top: -(windowH * 0.3), bottom: windowH * 0.3 }}
+        dragConstraints={{ top: 0, bottom: windowH * 0.3 }}
         dragElastic={0.1}
         className="absolute bottom-0 left-0 right-0 z-20"
-        style={{ maxHeight: '90vh' }}
+        style={{ maxHeight: '70vh' }}
       >
         <Toast message={toast.message} visible={toast.visible} onClose={hideToast} type={toast.type} />
         <div className="bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] overflow-hidden">
@@ -201,7 +224,7 @@ export default function OrderPanel({ onTripCreated, onRouteUpdate }: OrderPanelP
             <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto" />
           </div>
 
-          <div className="px-5 pb-8 overflow-y-auto" style={{ maxHeight: '80vh' }}>
+          <div className="px-5 pb-8 overflow-y-auto" style={{ maxHeight: '60vh' }}>
             {step === 'destination' && (
               <>
                 {/* Header row */}
@@ -266,20 +289,24 @@ export default function OrderPanel({ onTripCreated, onRouteUpdate }: OrderPanelP
                 {/* Destinos recientes */}
                 <div>
                   <p className="text-sm font-semibold text-gray-500 mb-3">Destinos recientes</p>
-                  <div className="space-y-1">
-                    {quickDestinations.map((dest) => (
-                      <button
-                        key={dest.name}
-                        onClick={() => handleSelectDest(dest)}
-                        className="w-full flex items-center gap-3 px-2 py-2.5 rounded-xl hover:bg-gray-50 active:scale-[0.98] transition-all"
-                      >
-                        <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center shrink-0">
-                          <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                        </div>
-                        <span className="text-sm font-semibold text-gray-900">{dest.icon} {dest.name}</span>
-                      </button>
-                    ))}
-                  </div>
+                  {recentDests.length === 0 ? (
+                    <p className="text-sm text-gray-400 px-2 py-4">Aún no tienes viajes recientes</p>
+                  ) : (
+                    <div className="space-y-1">
+                      {recentDests.map((dest, i) => (
+                        <button
+                          key={`${dest.name}-${i}`}
+                          onClick={() => handleSelectDest(dest)}
+                          className="w-full flex items-center gap-3 px-2 py-2.5 rounded-xl hover:bg-gray-50 active:scale-[0.98] transition-all"
+                        >
+                          <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center shrink-0">
+                            <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-900">{dest.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </>
             )}
