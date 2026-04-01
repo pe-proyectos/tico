@@ -47,7 +47,7 @@ export default function PassengerApp() {
   }, []);
 
   const handleTripCreated = async (trip: any) => {
-    setProposedPrice(trip.estimatedPrice || 0);
+    setProposedPrice(trip.offeredPrice || trip.estimatedPrice || 0);
     setCurrentTripId(trip.id);
     setCurrentTrip(trip);
     setOrderState('negotiating');
@@ -136,7 +136,7 @@ export default function PassengerApp() {
         )}
         
         {view === 'home' && orderState === 'negotiating' && currentTripId && (
-          <DriverList key="driver-list" tripId={currentTripId} proposedPrice={proposedPrice} onCancel={handleCancel} onDriverAccepted={handleDriverAccepted} />
+          <DriverList key="driver-list" tripId={currentTripId} proposedPrice={proposedPrice} originAddress={currentTrip?.originAddress || 'Tu ubicación actual'} destAddress={currentTrip?.destAddress || 'Destino'} autoAccept={currentTrip?.autoAccept} onCancel={handleCancel} onDriverAccepted={handleDriverAccepted} />
         )}
 
         {view === 'home' && orderState === 'accepted' && currentTripId && (
