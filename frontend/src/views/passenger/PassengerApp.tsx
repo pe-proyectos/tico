@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
@@ -36,7 +36,12 @@ export default function PassengerApp() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [routeData, setRouteData] = useState<RouteData | null>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | undefined>();
+  const [isMapMoving, setIsMapMoving] = useState(false);
   const navigate = useNavigate();
+
+  const handleMapMoving = useCallback((moving: boolean) => {
+    setIsMapMoving(moving);
+  }, []);
 
   React.useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -96,6 +101,7 @@ export default function PassengerApp() {
         destination={routeData?.destination} 
         routeCoords={routeData?.routeCoords}
         userLocation={userLocation}
+        onMapMoving={handleMapMoving}
       />
       
       <Sidebar 
@@ -132,7 +138,7 @@ export default function PassengerApp() {
         {view === 'editProfile' && <EditProfile key="editProfile" onBack={() => setView('profile')} />}
 
         {view === 'home' && orderState === 'idle' && (
-          <OrderPanel key="order-panel" onTripCreated={handleTripCreated} onRouteUpdate={setRouteData} />
+          <OrderPanel key="order-panel" onTripCreated={handleTripCreated} onRouteUpdate={setRouteData} isMapMoving={isMapMoving} />
         )}
         
         {view === 'home' && orderState === 'negotiating' && currentTripId && (

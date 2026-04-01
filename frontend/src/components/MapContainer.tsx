@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { MapPin } from 'lucide-react';
 import { MapContainer as LeafletMap, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -10,6 +10,7 @@ interface MapContainerProps {
   routeCoords?: [number, number][];
   userLocation?: [number, number];
   driverLocation?: [number, number];
+  onMapMoving?: (moving: boolean) => void;
 }
 
 const CHICLAYO_CENTER: [number, number] = [-6.7714, -79.8409];
@@ -34,6 +35,21 @@ const markerB = L.divIcon({
   iconSize: [28, 28],
   iconAnchor: [14, 14],
 });
+
+function MapMoveListener({ onMapMoving }: { onMapMoving: (moving: boolean) => void }) {
+  const map = useMap();
+  useEffect(() => {
+    const onMoveStart = () => onMapMoving(true);
+    const onMoveEnd = () => onMapMoving(false);
+    map.on('movestart', onMoveStart);
+    map.on('moveend', onMoveEnd);
+    return () => {
+      map.off('movestart', onMoveStart);
+      map.off('moveend', onMoveEnd);
+    };
+  }, [map, onMapMoving]);
+  return null;
+}
 
 function FitBounds({ origin, destination, routeCoords, userLocation }: { origin?: [number, number]; destination?: [number, number]; routeCoords?: [number, number][]; userLocation?: [number, number] }) {
   const map = useMap();
@@ -65,7 +81,7 @@ function FitBounds({ origin, destination, routeCoords, userLocation }: { origin?
   return null;
 }
 
-export default function MapContainer({ origin, destination, routeCoords, userLocation, driverLocation }: MapContainerProps) {
+export default function MapContainer({ origin, destination, routeCoords, userLocation, driverLocation, onMapMoving }: MapContainerProps) {
   const center: [number, number] = userLocation || CHICLAYO_CENTER;
   const hasRoute = origin && destination;
 
@@ -82,6 +98,7 @@ export default function MapContainer({ origin, destination, routeCoords, userLoc
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
         <FitBounds origin={origin} destination={destination} routeCoords={routeCoords} userLocation={userLocation} />
+        {onMapMoving && <MapMoveListener onMapMoving={onMapMoving} />}
         {origin && <Marker position={origin} icon={markerA} />}
         {destination && <Marker position={destination} icon={markerB} />}
         {driverLocation && <Marker position={driverLocation} icon={markerCar} />}
