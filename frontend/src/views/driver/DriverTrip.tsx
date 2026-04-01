@@ -72,7 +72,7 @@ export default function DriverTrip() {
 
   if (phase === 'completed') {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-6 bg-tico-yellow text-center">
+      <div className="h-full flex flex-col items-center justify-center p-6 bg-tico-green text-center">
         <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg mb-6">
           <CheckCircle2 className="w-12 h-12 text-green-500" />
         </div>
@@ -138,8 +138,8 @@ export default function DriverTrip() {
           </div>
 
           <div className="bg-gray-50 rounded-2xl p-4 mb-6 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-tico-yellow/20 flex items-center justify-center shrink-0">
-              {phase === 'en_route' ? <Navigation className="w-5 h-5 text-yellow-700" /> : <MapPin className="w-5 h-5 text-yellow-700" />}
+            <div className="w-10 h-10 rounded-full bg-tico-green/20 flex items-center justify-center shrink-0">
+              {phase === 'en_route' ? <Navigation className="w-5 h-5 text-emerald-700" /> : <MapPin className="w-5 h-5 text-emerald-700" />}
             </div>
             <div>
               <p className="text-xs font-bold text-gray-400 uppercase">

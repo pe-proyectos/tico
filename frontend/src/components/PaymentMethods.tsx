@@ -18,7 +18,7 @@ export default function PaymentMethods({ onBack }: { onBack: () => void }) {
       </div>
 
       <div className="p-6 space-y-4">
-        <div className="bg-white rounded-3xl p-4 shadow-sm border-2 border-tico-yellow flex items-center justify-between">
+        <div className="bg-white rounded-3xl p-4 shadow-sm border-2 border-tico-green flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
               <Banknote className="w-6 h-6 text-green-600" />
@@ -28,7 +28,7 @@ export default function PaymentMethods({ onBack }: { onBack: () => void }) {
               <p className="text-sm text-gray-500">Pago directo al conductor</p>
             </div>
           </div>
-          <div className="w-6 h-6 rounded-full border-4 border-tico-yellow bg-white"></div>
+          <div className="w-6 h-6 rounded-full border-4 border-tico-green bg-white"></div>
         </div>
 
         <div className="bg-gray-50 rounded-3xl p-6 text-center mt-8">

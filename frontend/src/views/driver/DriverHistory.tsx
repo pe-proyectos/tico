@@ -85,7 +85,7 @@ export default function DriverHistory() {
         ))}
       </div>
 
-      <div className="bg-tico-yellow rounded-3xl p-6 shadow-sm flex items-center justify-between">
+      <div className="bg-tico-green rounded-3xl p-6 shadow-sm flex items-center justify-between">
         <div>
           <p className="text-tico-black/70 font-bold uppercase text-xs mb-1">Ganancias ({filter})</p>
           <h2 className="text-4xl font-black text-tico-black">S/ {(earnings || filteredEarnings).toFixed(2)}</h2>
@@ -115,7 +115,7 @@ export default function DriverHistory() {
                   <p className="text-sm font-medium text-tico-black truncate">{trip.originAddress}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-tico-yellow shrink-0"></div>
+                  <div className="w-2 h-2 rounded-full bg-tico-green shrink-0"></div>
                   <p className="text-sm font-medium text-tico-black truncate">{trip.destAddress}</p>
                 </div>
               </div>

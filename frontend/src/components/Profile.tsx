@@ -42,32 +42,32 @@ export default function Profile({ onBack, onLogout, onEditProfile, onHistoryClic
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
       className="fixed inset-0 bg-gray-50 z-50 overflow-y-auto"
     >
-      <div className="bg-tico-yellow pt-12 pb-6 px-6 rounded-b-[40px] shadow-sm relative">
+      <div className="pt-12 pb-6 px-6 rounded-b-[40px] shadow-sm relative" style={{ background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)' }}>
         <button 
           onClick={onBack}
-          className="absolute top-12 left-6 w-10 h-10 rounded-full bg-tico-black/10 flex items-center justify-center"
+          className="absolute top-12 left-6 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
         >
-          <ArrowLeft className="w-6 h-6 text-tico-black" />
+          <ArrowLeft className="w-6 h-6 text-white" />
         </button>
         
         <div className="flex flex-col items-center mt-8">
           <div className="w-24 h-24 rounded-full bg-white p-1 shadow-md mb-4 relative">
-            <div className="w-full h-full rounded-full bg-tico-black/10 flex items-center justify-center">
-              <User className="w-10 h-10 text-tico-black/50" />
+            <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center">
+              <User className="w-10 h-10 text-gray-400" />
             </div>
-            <div className="absolute bottom-0 right-0 w-8 h-8 bg-tico-black rounded-full border-2 border-white flex items-center justify-center">
-              <Star className="w-4 h-4 text-tico-yellow fill-tico-yellow" />
+            <div className="absolute bottom-0 right-0 w-8 h-8 bg-amber-400 rounded-full border-2 border-white flex items-center justify-center">
+              <Star className="w-4 h-4 text-white fill-white" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-tico-black">{name}</h2>
-          <p className="text-tico-black/70 font-medium">{phone}</p>
+          <h2 className="text-2xl font-bold text-white">{name}</h2>
+          <p className="text-white/70 font-medium">{phone}</p>
         </div>
       </div>
 
       <div className="px-6 py-8 space-y-6">
         <div className="flex gap-4">
           <div className="flex-1 bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex flex-col items-center">
-            <Star className="w-6 h-6 text-tico-yellow fill-tico-yellow mb-2" />
+            <Star className="w-6 h-6 text-amber-400 fill-amber-400 mb-2" />
             <span className="text-2xl font-bold text-tico-black">{rating.toFixed(1)}</span>
             <span className="text-xs text-gray-500 font-medium">Calificación</span>
           </div>

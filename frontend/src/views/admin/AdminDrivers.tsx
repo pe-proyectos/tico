@@ -164,7 +164,7 @@ export default function AdminDrivers() {
                 <div>
                   <h4 className="font-bold text-lg text-tico-black">{selectedDriver.user.name || 'Sin nombre'}</h4>
                   <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-tico-yellow text-tico-yellow" />
+                    <Star className="w-4 h-4 fill-tico-green text-tico-green" />
                     <span className="text-sm font-bold">{selectedDriver.user.rating?.toFixed(1) || '0.0'}</span>
                   </div>
                 </div>

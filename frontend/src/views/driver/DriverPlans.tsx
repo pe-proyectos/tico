@@ -41,7 +41,7 @@ export default function DriverPlans() {
       features: ['100 viajes/día', 'Sin comisión', 'Soporte prioritario', 'Insignia PRO'],
       color: 'bg-tico-black',
       textColor: 'text-white',
-      buttonColor: 'bg-tico-yellow text-tico-black',
+      buttonColor: 'bg-tico-green text-tico-black',
       popular: true,
     },
     {
@@ -64,7 +64,7 @@ export default function DriverPlans() {
         {plans.map((plan) => (
           <div key={plan.name} className={`${plan.color} rounded-3xl p-6 shadow-lg relative overflow-hidden`}>
             {plan.popular && (
-              <div className="absolute top-0 right-0 bg-tico-yellow text-tico-black text-xs font-bold px-3 py-1 rounded-bl-xl flex items-center gap-1">
+              <div className="absolute top-0 right-0 bg-tico-green text-tico-black text-xs font-bold px-3 py-1 rounded-bl-xl flex items-center gap-1">
                 <Star className="w-3 h-3" /> MÁS POPULAR
               </div>
             )}

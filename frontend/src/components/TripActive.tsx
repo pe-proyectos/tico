@@ -133,7 +133,7 @@ export default function TripActive({ tripId, driver, onCancel, onCompleted }: Tr
           <div className="flex-1">
             <h3 className="font-bold text-tico-black text-lg">{driverName}</h3>
             <div className="flex items-center gap-1 mb-1">
-              <Star className="w-4 h-4 fill-tico-yellow text-tico-yellow" />
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
               <span className="text-sm font-bold text-tico-black">{driverRating.toFixed(1)}</span>
             </div>
             <p className="text-sm text-gray-500">{vehicleInfo}</p>
@@ -148,10 +148,10 @@ export default function TripActive({ tripId, driver, onCancel, onCompleted }: Tr
         </div>
 
         <div className="flex gap-3 mb-6">
-          <button onClick={handleCall} className="flex-1 bg-gray-100 hover:bg-gray-200 text-tico-black font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-colors">
+          <button onClick={handleCall} className="flex-1 bg-tico-green text-white font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-colors active:scale-[0.98]">
             <Phone className="w-5 h-5" /> Llamar
           </button>
-          <button onClick={handleMessage} className="flex-1 bg-gray-100 hover:bg-gray-200 text-tico-black font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-colors">
+          <button onClick={handleMessage} className="flex-1 bg-white border-2 border-gray-200 text-tico-black font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-colors active:scale-[0.98]">
             <MessageSquare className="w-5 h-5" /> Mensaje
           </button>
         </div>

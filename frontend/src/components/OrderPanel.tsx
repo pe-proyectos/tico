@@ -184,11 +184,11 @@ export default function OrderPanel({ onTripCreated, onRouteUpdate }: OrderPanelP
           </div>
 
           <div className="flex items-center gap-3 relative z-10">
-            <div className="w-10 h-10 rounded-full bg-tico-yellow/20 flex items-center justify-center shrink-0">
-              <MapPin className="w-5 h-5 text-yellow-600" />
+            <div className="w-10 h-10 rounded-full bg-tico-orange/20 flex items-center justify-center shrink-0">
+              <MapPin className="w-5 h-5 text-tico-orange" />
             </div>
             <div className="relative flex-1">
-              <div className="bg-white rounded-2xl px-4 py-3 border border-gray-200 shadow-sm focus-within:border-tico-yellow focus-within:ring-2 focus-within:ring-tico-yellow/20 transition-all flex items-center gap-2">
+              <div className="bg-white rounded-2xl px-4 py-3 border border-gray-200 shadow-sm focus-within:border-tico-green focus-within:ring-2 focus-within:ring-tico-green/30 transition-all flex items-center gap-2">
                 <Search className="w-4 h-4 text-gray-400" />
                 <input 
                   type="text" 
@@ -234,7 +234,7 @@ export default function OrderPanel({ onTripCreated, onRouteUpdate }: OrderPanelP
                     : 'bg-gray-50 text-gray-600 border border-gray-100 hover:bg-gray-100'
                 }`}
               >
-                <Icon className={`w-6 h-6 mb-2 ${isSelected ? 'text-tico-yellow' : 'text-gray-500'}`} />
+                <Icon className={`w-6 h-6 mb-2 ${isSelected ? 'text-tico-green' : 'text-gray-500'}`} />
                 <span className="text-xs font-semibold whitespace-nowrap">{cat.name}</span>
               </button>
             );
@@ -267,7 +267,7 @@ export default function OrderPanel({ onTripCreated, onRouteUpdate }: OrderPanelP
                   <button 
                     key={amount}
                     onClick={() => setPrice(p => (p || 0) + amount)}
-                    className="flex-1 h-12 rounded-2xl bg-tico-yellow/10 text-yellow-700 font-semibold text-sm active:scale-95 transition-transform border border-tico-yellow/20"
+                    className="flex-1 h-12 rounded-2xl bg-tico-green/10 text-tico-green font-semibold text-sm active:scale-95 transition-transform border border-tico-green/20"
                   >
                     +S/ {amount}
                   </button>
@@ -285,7 +285,7 @@ export default function OrderPanel({ onTripCreated, onRouteUpdate }: OrderPanelP
         <button 
           onClick={handleRequest}
           disabled={loading || !destCoords}
-          className="w-full bg-tico-yellow text-tico-black font-bold text-lg py-4 rounded-2xl shadow-[0_4px_14px_rgba(255,204,0,0.4)] active:scale-[0.98] transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full bg-tico-green text-tico-black font-bold text-lg py-4 rounded-2xl shadow-[0_4px_14px_rgba(255,204,0,0.4)] active:scale-[0.98] transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Solicitar Tico'}
         </button>

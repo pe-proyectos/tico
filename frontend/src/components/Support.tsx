@@ -30,7 +30,7 @@ export default function Support({ onBack }: { onBack: () => void }) {
       </div>
 
       <div className="p-6 space-y-6">
-        <div className="bg-tico-yellow/20 rounded-3xl p-6 text-center">
+        <div className="bg-tico-green/20 rounded-3xl p-6 text-center">
           <h2 className="text-xl font-bold text-tico-black mb-2">¿En qué podemos ayudarte?</h2>
           <p className="text-sm text-gray-600 mb-4">Nuestro equipo está disponible 24/7</p>
           <button onClick={handleChat} className="bg-tico-black text-white font-bold py-3 px-6 rounded-2xl w-full flex items-center justify-center gap-2">

@@ -73,12 +73,12 @@ export default function Sidebar({
             className="fixed top-0 left-0 bottom-0 w-[80%] max-w-sm bg-white z-[70] shadow-2xl flex flex-col"
           >
             {/* Header */}
-            <div className="bg-tico-yellow p-6 pt-12 pb-8 rounded-br-[40px] relative">
+            <div className="p-6 pt-12 pb-8 rounded-br-[40px] relative" style={{ background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)' }}>
               <button 
                 onClick={onClose}
                 className="absolute top-12 right-6 w-10 h-10 rounded-full bg-tico-black/10 flex items-center justify-center"
               >
-                <X className="w-6 h-6 text-tico-black" />
+                <X className="w-6 h-6 text-white" />
               </button>
               
               <div 
@@ -88,12 +88,12 @@ export default function Sidebar({
                   onProfileClick();
                 }}
               >
-                <div className="w-16 h-16 rounded-full border-2 border-white bg-tico-black flex items-center justify-center shadow-sm">
+                <div className="w-16 h-16 rounded-full border-2 border-white bg-white/20 flex items-center justify-center shadow-sm">
                   <span className="text-2xl font-bold text-white">{userInitial}</span>
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-tico-black leading-tight">{userName}</h2>
-                  <p className="text-tico-black/70 font-medium text-sm">Ver perfil</p>
+                  <h2 className="text-xl font-bold text-white leading-tight">{userName}</h2>
+                  <p className="text-white/70 font-medium text-sm">Ver perfil</p>
                 </div>
               </div>
             </div>
@@ -112,8 +112,8 @@ export default function Sidebar({
                 onClick={() => { onClose(); onDriverModeClick(); }}
                 className="w-full bg-gray-50 hover:bg-gray-100 text-tico-black p-4 rounded-2xl flex items-center gap-4 transition-colors"
               >
-                <div className="w-10 h-10 rounded-full bg-tico-yellow/20 flex items-center justify-center">
-                  <CarFront className="w-5 h-5 text-yellow-700" />
+                <div className="w-10 h-10 rounded-full bg-tico-green/15 flex items-center justify-center">
+                  <CarFront className="w-5 h-5 text-tico-green" />
                 </div>
                 <div className="text-left flex-1">
                   <span className="block font-bold text-tico-black">Modo Conductor</span>

@@ -33,7 +33,7 @@ export default function DriverMode({ onBack }: { onBack: () => void }) {
 
   if (success) {
     return (
-      <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} className="fixed inset-0 bg-tico-yellow z-50 flex flex-col items-center justify-center p-6 text-center">
+      <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} className="fixed inset-0 bg-tico-green z-50 flex flex-col items-center justify-center p-6 text-center">
         <CheckCircle2 className="w-20 h-20 text-green-600 mb-4" />
         <h1 className="text-3xl font-bold text-tico-black">¡Registro exitoso!</h1>
         <p className="text-tico-black/70 mt-2">Redirigiendo al panel de conductor...</p>
@@ -47,7 +47,7 @@ export default function DriverMode({ onBack }: { onBack: () => void }) {
       animate={{ x: 0 }}
       exit={{ x: "100%" }}
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
-      className="fixed inset-0 bg-tico-yellow z-50 overflow-y-auto flex flex-col"
+      className="fixed inset-0 bg-tico-green z-50 overflow-y-auto flex flex-col"
     >
       <Toast message={toast.message} visible={toast.visible} onClose={hideToast} type={toast.type} />
       <div className="pt-12 pb-4 px-6 sticky top-0 z-10 flex items-center gap-4">

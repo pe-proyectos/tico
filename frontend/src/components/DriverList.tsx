@@ -91,7 +91,7 @@ export default function DriverList({ tripId, proposedPrice, onCancel, onDriverAc
         <div className="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-hide">
           {searching && (
             <div className="h-full flex flex-col items-center justify-center text-gray-400">
-              <div className="w-12 h-12 border-4 border-tico-yellow border-t-transparent rounded-full animate-spin mb-4"></div>
+              <div className="w-12 h-12 border-4 border-tico-green border-t-transparent rounded-full animate-spin mb-4"></div>
               <p className="font-medium">Buscando conductores cercanos...</p>
               <p className="text-sm mt-2">Esto puede tomar unos segundos</p>
             </div>
@@ -103,7 +103,7 @@ export default function DriverList({ tripId, proposedPrice, onCancel, onDriverAc
               <p className="text-sm mb-6">Intenta de nuevo en unos minutos</p>
               <button 
                 onClick={handleRetry}
-                className="bg-tico-yellow text-tico-black font-bold px-8 py-3 rounded-2xl active:scale-95 transition-transform"
+                className="bg-tico-green text-tico-black font-bold px-8 py-3 rounded-2xl active:scale-95 transition-transform"
               >
                 Reintentar
               </button>

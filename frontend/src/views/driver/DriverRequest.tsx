@@ -38,7 +38,7 @@ export default function DriverRequest({ trip, onAccept, onReject }: DriverReques
           {/* Progress Bar Background */}
           <div className="absolute top-0 left-0 right-0 h-2 bg-gray-100">
             <motion.div 
-              className="h-full bg-tico-yellow"
+              className="h-full bg-tico-green"
               initial={{ width: "100%" }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 1, ease: "linear" }}
@@ -59,7 +59,7 @@ export default function DriverRequest({ trip, onAccept, onReject }: DriverReques
                   cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="4" fill="transparent" 
                   strokeDasharray="175.93" 
                   strokeDashoffset={175.93 - (175.93 * progress) / 100}
-                  className="text-tico-yellow transition-all duration-1000 ease-linear" 
+                  className="text-tico-green transition-all duration-1000 ease-linear" 
                 />
               </svg>
               <span className="absolute text-xl font-bold text-tico-black">{timeLeft}</span>
@@ -78,8 +78,8 @@ export default function DriverRequest({ trip, onAccept, onReject }: DriverReques
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-tico-yellow/20 flex items-center justify-center shrink-0">
-                <Navigation className="w-5 h-5 text-yellow-700" />
+              <div className="w-10 h-10 rounded-full bg-tico-green/20 flex items-center justify-center shrink-0">
+                <Navigation className="w-5 h-5 text-emerald-700" />
               </div>
               <div>
                 <p className="text-xs font-bold text-gray-400 uppercase">Dejar en</p>

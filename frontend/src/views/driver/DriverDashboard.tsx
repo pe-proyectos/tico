@@ -110,7 +110,7 @@ export default function DriverDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-black text-tico-black">Hola, {userName.split(' ')[0]}</h1>
-          <p className="text-gray-500 font-medium">Plan <span className="text-tico-black font-bold bg-tico-yellow/20 px-2 py-0.5 rounded-md">{stats?.planType || 'FREE'}</span></p>
+          <p className="text-gray-500 font-medium">Plan <span className="text-tico-black font-bold bg-tico-green/20 px-2 py-0.5 rounded-md">{stats?.planType || 'FREE'}</span></p>
         </div>
         <button 
           onClick={() => {
@@ -154,7 +154,7 @@ export default function DriverDashboard() {
           <p className="text-xs font-bold text-gray-400 uppercase">Ganancias</p>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center">
-          <Star className="w-6 h-6 text-tico-yellow mx-auto mb-2" />
+          <Star className="w-6 h-6 text-tico-green mx-auto mb-2" />
           <p className="text-2xl font-black text-tico-black">{auth.user?.rating?.toFixed(1) || '0.0'}</p>
           <p className="text-xs font-bold text-gray-400 uppercase">Rating</p>
         </div>

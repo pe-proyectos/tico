@@ -32,8 +32,8 @@ export default function DriverLayout() {
                 isActive ? 'text-tico-black' : 'text-gray-400 hover:text-gray-600'
               }`}
             >
-              <div className={`w-12 h-8 rounded-full flex items-center justify-center transition-colors ${isActive ? 'bg-tico-yellow/20' : 'bg-transparent'}`}>
-                <Icon className={`w-6 h-6 ${isActive ? 'text-yellow-700' : ''}`} />
+              <div className={`w-12 h-8 rounded-full flex items-center justify-center transition-colors ${isActive ? 'bg-tico-green/20' : 'bg-transparent'}`}>
+                <Icon className={`w-6 h-6 ${isActive ? 'text-emerald-700' : ''}`} />
               </div>
               <span className={`text-[10px] font-bold ${isActive ? 'text-tico-black' : ''}`}>{item.label}</span>
             </Link>

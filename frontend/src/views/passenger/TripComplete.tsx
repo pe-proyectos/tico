@@ -67,9 +67,9 @@ export default function TripComplete({ tripId, trip, onDone }: TripCompleteProps
             <button 
               key={star} 
               onClick={() => handleRate(star)}
-              className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center hover:bg-tico-yellow/20 transition-colors"
+              className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center hover:bg-tico-green/20 transition-colors"
             >
-              <Star className={`w-6 h-6 ${rating >= star ? 'fill-tico-yellow text-tico-yellow' : 'text-gray-400'}`} />
+              <Star className={`w-6 h-6 ${rating >= star ? 'fill-tico-green text-tico-green' : 'text-gray-400'}`} />
             </button>
           ))}
         </div>

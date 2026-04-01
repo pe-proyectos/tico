@@ -21,7 +21,7 @@ export default function AdminPlans() {
       price: 'S/ 500',
       period: '/mes',
       features: ['Viajes ilimitados', 'Sin comisión', 'Soporte 24/7', 'Viajes corporativos'],
-      color: 'bg-tico-yellow text-tico-black',
+      color: 'bg-tico-green text-tico-black',
     },
   ];
 
