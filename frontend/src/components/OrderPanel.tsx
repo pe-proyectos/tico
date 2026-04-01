@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { MapPin, Navigation, Car, Truck, Zap, Search, Loader2, Minus, Plus, SlidersHorizontal, Banknote } from 'lucide-react';
+import { MapPin, Navigation, Car, Truck, Zap, Search, Loader2, Minus, Plus, SlidersHorizontal, Banknote, ChevronDown } from 'lucide-react';
 import { motion, useMotionValue, useTransform, animate } from 'motion/react';
 import { AnimatePresence } from 'motion/react';
 import { api } from '../lib/api';
@@ -204,67 +204,81 @@ export default function OrderPanel({ onTripCreated, onRouteUpdate }: OrderPanelP
           <div className="px-5 pb-8 overflow-y-auto" style={{ maxHeight: '80vh' }}>
             {step === 'destination' && (
               <>
-                {/* Quick Destinations */}
-                <div className="flex gap-2.5 overflow-x-auto pb-3 mb-3 scrollbar-hide">
-                  {quickDestinations.map((dest) => (
-                    <button
-                      key={dest.name}
-                      onClick={() => handleSelectDest(dest)}
-                      className="flex items-center gap-2 bg-gray-50 px-3.5 py-2 rounded-xl whitespace-nowrap active:scale-95 transition-transform border border-gray-100 hover:bg-gray-100"
-                    >
-                      <span>{dest.icon}</span>
-                      <span className="font-semibold text-sm text-gray-900">{dest.name}</span>
-                    </button>
-                  ))}
+                {/* Header row */}
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-gray-900">¿A dónde vas?</h2>
+                  <button className="flex items-center gap-1.5 bg-emerald-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                    Ahora
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
                 </div>
 
-                {/* Origin / Destination */}
-                <div className="space-y-3 relative">
-                  <div className="absolute left-5 top-5 bottom-5 w-0.5 bg-gray-200 z-0" />
-
-                  <div className="flex items-center gap-3 relative z-10">
-                    <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
-                      <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                {/* Origin / Destination card */}
+                <div className="bg-gray-50 rounded-2xl p-4 mb-4">
+                  <div className="flex gap-3">
+                    {/* Dots + line */}
+                    <div className="flex flex-col items-center pt-1">
+                      <div className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
+                      <div className="w-0.5 flex-1 bg-gray-300 my-1" />
+                      <div className="w-3 h-3 rounded-full bg-red-500 shrink-0" />
                     </div>
-                    <div className="flex-1 bg-gray-50 rounded-2xl px-4 py-3 border border-gray-100">
-                      <p className="text-xs text-gray-500 font-medium">Origen</p>
-                      <p className="text-sm font-semibold text-gray-900">Tu ubicación actual</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 relative z-10">
-                    <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0">
-                      <div className="w-3 h-3 rounded-full bg-red-500" />
-                    </div>
-                    <div className="relative flex-1">
-                      <div className="bg-white rounded-2xl px-4 py-3 border border-gray-200 shadow-sm focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/30 transition-all flex items-center gap-2">
-                        <Search className="w-4 h-4 text-gray-400" />
+                    {/* Rows */}
+                    <div className="flex-1 space-y-3">
+                      {/* Desde */}
+                      <div>
+                        <p className="text-xs text-gray-400 font-medium">Desde</p>
+                        <p className="text-sm font-semibold text-gray-900">Tu ubicación actual</p>
+                      </div>
+                      {/* Divider */}
+                      <div className="border-t border-gray-200" />
+                      {/* ¿A dónde? */}
+                      <div className="relative">
+                        <p className="text-xs text-gray-400 font-medium mb-1">¿A dónde?</p>
                         <input
                           type="text"
-                          placeholder="¿A dónde vas?"
+                          placeholder="Burj Khalifa, Abu Dhabi, etc"
                           value={destination}
                           onChange={(e) => handleInputChange(e.target.value)}
                           onFocus={() => searchResults.length > 0 && setShowResults(true)}
-                          className="w-full bg-transparent outline-none text-sm font-semibold text-gray-900 placeholder:text-gray-400"
+                          className="w-full bg-white rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-900 placeholder:text-gray-400 border border-gray-200 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition-all"
                         />
+                        {showResults && searchResults.length > 0 && (
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50 max-h-48 overflow-y-auto">
+                            {searchResults.map((result) => (
+                              <button
+                                key={result.place_id}
+                                onClick={() => selectSearchResult(result)}
+                                className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0"
+                              >
+                                <p className="text-sm font-semibold text-gray-900 truncate">
+                                  {result.display_name.split(',').slice(0, 2).join(',')}
+                                </p>
+                                <p className="text-xs text-gray-400 truncate">{result.display_name}</p>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      {showResults && searchResults.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50 max-h-48 overflow-y-auto">
-                          {searchResults.map((result) => (
-                            <button
-                              key={result.place_id}
-                              onClick={() => selectSearchResult(result)}
-                              className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0"
-                            >
-                              <p className="text-sm font-semibold text-gray-900 truncate">
-                                {result.display_name.split(',').slice(0, 2).join(',')}
-                              </p>
-                              <p className="text-xs text-gray-400 truncate">{result.display_name}</p>
-                            </button>
-                          ))}
-                        </div>
-                      )}
                     </div>
+                  </div>
+                </div>
+
+                {/* Destinos recientes */}
+                <div>
+                  <p className="text-sm font-semibold text-gray-500 mb-3">Destinos recientes</p>
+                  <div className="space-y-1">
+                    {quickDestinations.map((dest) => (
+                      <button
+                        key={dest.name}
+                        onClick={() => handleSelectDest(dest)}
+                        className="w-full flex items-center gap-3 px-2 py-2.5 rounded-xl hover:bg-gray-50 active:scale-[0.98] transition-all"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center shrink-0">
+                          <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900">{dest.icon} {dest.name}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               </>
