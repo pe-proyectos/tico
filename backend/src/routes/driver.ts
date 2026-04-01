@@ -45,6 +45,7 @@ export const driverRoutes = new Elysia({ prefix: "/api" })
         vehicleBrand: body.vehicleBrand,
         vehicleModel: body.vehicleModel,
         vehicleColor: body.vehicleColor,
+        status: "APPROVED", // Auto-approve for MVP
       },
     });
     await prisma.user.update({ where: { id: user.id }, data: { role: "DRIVER" } });
